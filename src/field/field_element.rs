@@ -51,7 +51,7 @@ impl<const P: u64> Div for FieldElement<P> {
     type Output = Self;
     fn div(self, element: Self) -> Self::Output {
         if element.value == 0 {
-            Self { value: 0 }
+            panic!("Atempting to divide by zero");
         } else {
             match mod_inverse(element.value, P) {
                 Some(x) => {
