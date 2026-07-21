@@ -1,5 +1,6 @@
-use std::ops::Add;
+use std::ops::{Add, Sub};
 
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub struct FieldElement<const P: u64> {
     pub value: u64,
 }
@@ -19,5 +20,12 @@ impl<const P: u64> Add for FieldElement<P> {
     type Output = Self;
     fn add(self, element: Self) -> Self::Output {
         Self::from_u64(self.value + element.value)
+    }
+}
+
+impl<const P: u64> Sub for FieldElement<P> {
+    type Output = Self;
+    fn sub(self, element: Self) -> Self::Output {
+        Self::from_i64((self.value as i64 - element.value as i64) as i64)
     }
 }

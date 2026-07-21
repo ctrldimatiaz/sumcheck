@@ -13,4 +13,7 @@ fn main() {
 
     let field_element_operation: FieldElement<17> = field_element + negative_field_element;
     println!("Hello algebraic element: {}", field_element_operation.value);
+
+    let field_element_subtract: FieldElement<17> = field_element - negative_field_element;
+    println!("Hello algebraic element: {}", field_element_subtract.value);
 }
