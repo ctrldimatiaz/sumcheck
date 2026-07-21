@@ -58,9 +58,7 @@ impl<const P: u64> Div for FieldElement<P> {
                     let res = x * self.value;
                     return FieldElement::from_u64(res);
                 }
-                None => {
-                    panic!("Error calculating euclidian inverse");
-                }
+                None => panic!("Error calculating euclidian inverse"),
             };
         }
     }
@@ -103,4 +101,56 @@ fn mod_inverse(e: u64, p: u64) -> Option<u64> {
         t = t + (p as i64);
     }
     Some(t as u64)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // Define a concrete field for testing: F_13
+    type F13 = FieldElement<13>;
+    type F23 = FieldElement<23>;
+
+    #[test]
+    fn test_normalization_negative() {
+        // -1 mod 13 should be 12
+        let a = F13::from_i64(-1);
+        assert_eq!(a.value, 12);
+
+        // -14 mod 13 should be 12
+        let b = F13::from_i64(-14);
+        assert_eq!(b.value, 12);
+    }
+
+    #[test]
+    fn test_addition_closure() {
+        let a = F13::from_u64(7);
+        let b = F13::from_u64(8);
+        let c = a + b;
+        // 7 + 8 = 15 ≡ 2 mod 13
+        assert_eq!(c.value, 2);
+    }
+
+    #[test]
+    fn test_multiplication_and_inverse() {
+        let a = F23::from_u64(7);
+        let b = F23::from_u64(10);
+        let product = a * b;
+
+        // Verify inverse: (a * b) * (a * b)^-1 = 1
+        if product.value != 0 {
+            let inv = F23::from_u64(mod_inverse(product.value, 23).unwrap());
+            let one = product * inv;
+            assert_eq!(one.value, 1);
+        }
+    }
+
+    #[test]
+    #[should_panic(expected = "Atempting to divide by zero")]
+    fn test_division_by_zero_behavior() {
+        let a = F13::from_u64(5);
+        let zero = F13::from_u64(0);
+
+        let _ = a / zero;
+    }
 }

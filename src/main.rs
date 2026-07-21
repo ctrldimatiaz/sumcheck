@@ -1,8 +1,11 @@
 use crate::field::field_element::FieldElement;
+use env_logger;
 
 mod field;
 
 fn main() {
+    env_logger::init();
+
     //after initialization there are no negative field elements
     let field_element: FieldElement<17> = FieldElement::from_u64(6);
     let negative_field_element: FieldElement<17> = FieldElement::from_i64(-55);
