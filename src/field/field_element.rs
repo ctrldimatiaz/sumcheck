@@ -41,7 +41,8 @@ impl<const P: u64> FieldElement<P> {
 impl<const P: u64> Add for FieldElement<P> {
     type Output = Self;
     fn add(self, element: Self) -> Self::Output {
-        Self::from_u64(self.value + element.value)
+        let sum = (self.value as u128 + element.value as u128) % (P as u128);
+        Self::from_u64(sum as u64)
     }
 }
 
@@ -53,7 +54,7 @@ impl<const P: u64> Sub for FieldElement<P> {
     }
 }
 
-//For learning purposes we use u64 and u128 to avoid multiplication overflwow
+// For learning purposes we use u64 and u128 to avoid multiplication overflwow
 impl<const P: u64> Mul for FieldElement<P> {
     type Output = Self;
     fn mul(self, element: Self) -> Self::Output {
@@ -62,7 +63,7 @@ impl<const P: u64> Mul for FieldElement<P> {
     }
 }
 
-/// We actually multiply by one of the inverse
+/// We actually multiply by the inverse
 impl<const P: u64> Div for FieldElement<P> {
     type Output = Self;
     fn div(self, element: Self) -> Self::Output {
