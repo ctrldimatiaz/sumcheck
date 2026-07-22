@@ -56,7 +56,8 @@ impl<const P: u64> FieldElement<P> {
     }
 }
 
-//Since we create a new FieldElement the range will always fall in (0, P-1)
+//Since we create a new FieldElement the range will always fall in (0, P-1) range.
+//To avoid overflow we cast the sum to u128.
 impl<const P: u64> Add for FieldElement<P> {
     type Output = Self;
     fn add(self, element: Self) -> Self::Output {
@@ -65,7 +66,7 @@ impl<const P: u64> Add for FieldElement<P> {
     }
 }
 
-//Since we create a new FieldElement the range will always fall in (0, P-1)
+//Since we use Neg combined with Add methods we are sure it will fall in (0, P-1) range.
 impl<const P: u64> Sub for FieldElement<P> {
     type Output = Self;
     fn sub(self, element: Self) -> Self::Output {
@@ -73,7 +74,7 @@ impl<const P: u64> Sub for FieldElement<P> {
     }
 }
 
-// For learning purposes we use u64 and u128 to avoid multiplication overflwow
+// For learning purposes we use u64 and u128 to avoid multiplication overflow
 impl<const P: u64> Mul for FieldElement<P> {
     type Output = Self;
     fn mul(self, element: Self) -> Self::Output {
