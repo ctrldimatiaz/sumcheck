@@ -1,4 +1,4 @@
-use crate::field::field_element::FieldElement;
+use crate::{field::field_element::FieldElement, polynomial::univariate::Polynomial};
 use env_logger;
 
 mod field;
@@ -40,4 +40,20 @@ fn main() {
 
     let default_element: FieldElement<17> = FieldElement::default();
     println!("Hello default value: {}", default_element);
+
+    let vector: Vec<FieldElement<17>> =
+        vec![field_element, negative_field_element, field_element_divided];
+
+    let polynomial = Polynomial::from_field_vec(vector);
+
+    let result = polynomial.evaluate(field_element_multiplied);
+
+    println!(
+        "Evaluate polynomial {} {}x {}x² at element {}: Result : {}",
+        field_element,
+        negative_field_element,
+        field_element_divided,
+        field_element_multiplied,
+        result
+    )
 }

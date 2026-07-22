@@ -35,6 +35,25 @@ impl<const P: u64> FieldElement<P> {
             None => panic!("No inverse exists"),
         }
     }
+
+    pub fn pow(self, mut exp: u64) -> Self {
+        let mut base = self;
+        let mut result = Self::one();
+
+        while exp > 0 {
+            // If the current bit of the exponent is 1, multiply the result by the base
+            if exp % 2 == 1 {
+                result = result * base;
+            }
+            // Square the base for the next bit
+            base = base * base;
+            // Shift exponent to the right by 1 bit (divide by 2)
+            // Z13: 13 -> 6 -> 3 -> 1
+            //       3¹ -> unchanged -> 3¹.3⁴ -> (3¹.3⁴).3⁸
+            exp >>= 1;
+        }
+        result
+    }
 }
 
 //Since we create a new FieldElement the range will always fall in (0, P-1)
@@ -82,6 +101,7 @@ impl<const P: u64> Neg for FieldElement<P> {
         }
     }
 }
+
 impl<const P: u64> Default for FieldElement<P> {
     fn default() -> Self {
         Self::zero()
