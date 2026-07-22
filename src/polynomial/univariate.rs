@@ -17,7 +17,6 @@ impl<const P: u64> Polynomial<P> {
 
         for (index, item) in self.coefficients.iter().enumerate() {
             result = result + (*item * element.pow(index as u64));
-            println!("Result is  {}", result);
         }
 
         result
