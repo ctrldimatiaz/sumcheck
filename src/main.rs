@@ -2,6 +2,7 @@ use crate::field::field_element::FieldElement;
 use env_logger;
 
 mod field;
+mod polynomial;
 
 fn main() {
     env_logger::init();
@@ -36,4 +37,7 @@ fn main() {
 
     let field_element_divided: FieldElement<17> = field_element / negative_field_element;
     println!("Hello algebraic element divided: {}", field_element_divided);
+
+    let default_element: FieldElement<17> = FieldElement::default();
+    println!("Hello default value: {}", default_element);
 }

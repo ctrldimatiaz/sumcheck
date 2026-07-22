@@ -82,6 +82,11 @@ impl<const P: u64> Neg for FieldElement<P> {
         }
     }
 }
+impl<const P: u64> Default for FieldElement<P> {
+    fn default() -> Self {
+        Self::zero()
+    }
+}
 
 // Display
 impl<const P: u64> Display for FieldElement<P> {
