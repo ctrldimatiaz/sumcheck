@@ -1,6 +1,6 @@
 use std::{
     fmt::Display,
-    ops::{Add, Div, Mul, Sub},
+    ops::{Add, Div, Mul, Neg, Sub},
 };
 
 #[derive(Debug, Copy, Clone, PartialEq)]
@@ -11,12 +11,28 @@ pub struct FieldElement<const P: u64> {
 //During initialization we make sure the value falls into (0, p-1) through reaminder or euclidian
 //remainder in case of negative values being a possibility
 impl<const P: u64> FieldElement<P> {
+    pub fn zero() -> Self {
+        Self { value: 0 }
+    }
+
+    pub fn one() -> Self {
+        Self { value: 1 }
+    }
+
     pub fn from_u64(value: u64) -> Self {
         Self { value: value % P }
     }
     pub fn from_i64(value: i64) -> Self {
         Self {
             value: value.rem_euclid(P as i64) as u64,
+        }
+    }
+    pub fn inverse(self) -> Self {
+        assert!(self.value != 0, "Zero has no inverse");
+
+        match mod_inverse(self.value, P) {
+            Some(x) => Self::from_u64(x),
+            None => panic!("No inverse exists"),
         }
     }
 }
@@ -33,7 +49,7 @@ impl<const P: u64> Add for FieldElement<P> {
 impl<const P: u64> Sub for FieldElement<P> {
     type Output = Self;
     fn sub(self, element: Self) -> Self::Output {
-        Self::from_i64((self.value as i64 - element.value as i64) as i64)
+        self + (-element)
     }
 }
 
@@ -50,16 +66,18 @@ impl<const P: u64> Mul for FieldElement<P> {
 impl<const P: u64> Div for FieldElement<P> {
     type Output = Self;
     fn div(self, element: Self) -> Self::Output {
-        if element.value == 0 {
-            panic!("Atempting to divide by zero");
+        self * element.inverse()
+    }
+}
+
+impl<const P: u64> Neg for FieldElement<P> {
+    type Output = Self;
+
+    fn neg(self) -> Self {
+        if self.value == 0 {
+            Self::zero()
         } else {
-            match mod_inverse(element.value, P) {
-                Some(x) => {
-                    let res = x * self.value;
-                    return FieldElement::from_u64(res);
-                }
-                None => panic!("Error calculating euclidian inverse"),
-            };
+            Self::from_u64(P - self.value)
         }
     }
 }
@@ -105,6 +123,8 @@ fn mod_inverse(e: u64, p: u64) -> Option<u64> {
 
 #[cfg(test)]
 mod tests {
+    use proptest::proptest;
+
     use super::*;
 
     // Define a concrete field for testing: F_13
@@ -113,13 +133,13 @@ mod tests {
 
     #[test]
     fn test_normalization_negative() {
-        // -1 mod 13 should be 12
-        let a = F13::from_i64(-1);
-        assert_eq!(a.value, 12);
+        assert_eq!(F13::from_i64(-1), F13::from_u64(12));
+        assert_eq!(F13::from_i64(-14), F13::from_u64(12));
 
-        // -14 mod 13 should be 12
-        let b = F13::from_i64(-14);
-        assert_eq!(b.value, 12);
+        assert_eq!(F13::from_i64(0), F13::zero());
+        assert_eq!(F13::from_i64(13), F13::zero());
+        assert_eq!(F13::from_i64(26), F13::zero());
+        assert_eq!(F13::from_i64(-26), F13::zero());
     }
 
     #[test]
@@ -128,29 +148,31 @@ mod tests {
         let b = F13::from_u64(8);
         let c = a + b;
         // 7 + 8 = 15 ≡ 2 mod 13
-        assert_eq!(c.value, 2);
+        assert_eq!(c, F13::from_u64(2));
     }
 
-    #[test]
-    fn test_multiplication_and_inverse() {
-        let a = F23::from_u64(7);
-        let b = F23::from_u64(10);
-        let product = a * b;
-
-        // Verify inverse: (a * b) * (a * b)^-1 = 1
-        if product.value != 0 {
-            let inv = F23::from_u64(mod_inverse(product.value, 23).unwrap());
-            let one = product * inv;
-            assert_eq!(one.value, 1);
+    proptest! {
+        #[test]
+        fn every_nonzero_element_has_an_inverse(a in 1u64..23) {
+            let a = F23::from_u64(a);
+            assert_eq!(a * a.inverse(), F23::one());
         }
     }
 
     #[test]
-    #[should_panic(expected = "Atempting to divide by zero")]
+    #[should_panic(expected = "Zero has no inverse")]
     fn test_division_by_zero_behavior() {
         let a = F13::from_u64(5);
         let zero = F13::from_u64(0);
 
         let _ = a / zero;
+    }
+
+    #[test]
+    fn test_division() {
+        let a = F23::from_u64(15);
+        let b = F23::from_u64(7);
+
+        assert_eq!((a / b) * b, a);
     }
 }
