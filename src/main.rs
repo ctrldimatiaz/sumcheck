@@ -1,6 +1,6 @@
 use crate::{
     field::field_element::FieldElement,
-    polynomial::{multivariate::MultivariatePolynomial, univariate::Polynomial},
+    polynomial::{multivariate::MultivariatePolynomial, univariate::UnivariatePolynomial},
 };
 use env_logger;
 
@@ -47,7 +47,7 @@ fn main() {
     let vector: Vec<FieldElement<17>> =
         vec![field_element, negative_field_element, field_element_divided];
 
-    let polynomial = Polynomial::from_field_vec(vector);
+    let polynomial = UnivariatePolynomial::from_field_vec(vector);
 
     let result = polynomial.evaluate(&field_element_multiplied);
 

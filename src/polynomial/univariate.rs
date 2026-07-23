@@ -1,11 +1,11 @@
 use crate::FieldElement;
 
 //we will store the coefficients an such that as a0 + a1*x + ... an*x^n,
-pub struct Polynomial<const P: u64> {
+pub struct UnivariatePolynomial<const P: u64> {
     coefficients: Vec<FieldElement<P>>,
 }
 
-impl<const P: u64> Polynomial<P> {
+impl<const P: u64> UnivariatePolynomial<P> {
     pub fn from_field_vec(vector: Vec<FieldElement<P>>) -> Self {
         Self {
             coefficients: vector,
