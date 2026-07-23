@@ -36,6 +36,7 @@ impl<const P: u64> FieldElement<P> {
         }
     }
 
+    // Binary Exponentiation O(logn) instead of O(n)
     pub fn pow(self, mut exp: u64) -> Self {
         let mut base = self;
         let mut result = Self::one();

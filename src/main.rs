@@ -4,6 +4,7 @@ use crate::{
 };
 use env_logger;
 
+mod error;
 mod field;
 mod polynomial;
 
