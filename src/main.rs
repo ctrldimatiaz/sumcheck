@@ -1,4 +1,7 @@
-use crate::{field::field_element::FieldElement, polynomial::univariate::Polynomial};
+use crate::{
+    field::field_element::FieldElement,
+    polynomial::{multivariate::MultivariatePolynomial, univariate::Polynomial},
+};
 use env_logger;
 
 mod field;
@@ -46,7 +49,7 @@ fn main() {
 
     let polynomial = Polynomial::from_field_vec(vector);
 
-    let result = polynomial.evaluate(field_element_multiplied);
+    let result = polynomial.evaluate(&field_element_multiplied);
 
     println!(
         "Evaluate polynomial {} {}x {}x² at element {}: Result : {}",
@@ -54,6 +57,31 @@ fn main() {
         negative_field_element,
         field_element_divided,
         field_element_multiplied,
+        result
+    );
+
+    let variables_vector: Vec<Vec<FieldElement<17>>> = vec![
+        vec![field_element, field_element_divided, field_element_subtract],
+        vec![
+            field_element_subtract,
+            field_element_subtract,
+            field_element_subtract,
+        ],
+    ];
+
+    let multivariate_polynomial = MultivariatePolynomial::from_variables_vec(variables_vector);
+
+    let result = multivariate_polynomial.evaluate(&vec![field_element, field_element_divided]);
+
+    println!(
+        "Evaluate polynomial {} {}x{}y {}x²{}y² at element (x,y) {} {}: Result : {}",
+        field_element * field_element_subtract,
+        field_element_divided,
+        field_element_subtract,
+        field_element_subtract,
+        field_element_subtract,
+        field_element,
+        field_element_divided,
         result
     )
 }

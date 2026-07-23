@@ -12,7 +12,7 @@ impl<const P: u64> Polynomial<P> {
         }
     }
 
-    pub fn evaluate(self, element: FieldElement<P>) -> FieldElement<P> {
+    pub fn evaluate(self, element: &FieldElement<P>) -> FieldElement<P> {
         let mut result: FieldElement<P> = FieldElement::zero();
 
         for (index, item) in self.coefficients.iter().enumerate() {
