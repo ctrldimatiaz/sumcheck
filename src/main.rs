@@ -1,6 +1,10 @@
 use crate::{
     field::field_element::FieldElement,
-    polynomial::{multivariate::MultivariatePolynomial, univariate::UnivariatePolynomial},
+    polynomial::{
+        monomial::Monomial, multilinear::MultilinearPolynomial,
+        multivariate::MultivariatePolynomial, polynomial::Polynomial,
+        univariate::UnivariatePolynomial,
+    },
 };
 use env_logger;
 
@@ -84,5 +88,25 @@ fn main() {
         field_element,
         field_element_divided,
         result
-    )
+    );
+
+    let polynomial: Polynomial<17> = Polynomial::new(vec![
+        Monomial {
+            coefficient: FieldElement::from_u64(5),
+            exponents: vec![0, 0],
+        },
+        Monomial {
+            coefficient: FieldElement::from_u64(5),
+            exponents: vec![1, 1],
+        },
+    ])
+    .unwrap();
+
+    let multilinear = MultilinearPolynomial::new(polynomial).unwrap();
+
+    let result = multilinear
+        .evaluate(vec![field_element_subtract, field_element_divided])
+        .unwrap();
+
+    println!("Evaluate multilinear polynomial at  Result : {}", result);
 }
