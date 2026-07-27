@@ -32,6 +32,6 @@ impl<const P: u64> MultilinearPolynomial<P> {
 // Display
 impl<const P: u64> Display for MultilinearPolynomial<P> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.polynomial.terms.iter().join(""))
+        write!(f, "{}", self.polynomial.terms.iter().join(" + "))
     }
 }

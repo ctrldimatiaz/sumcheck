@@ -25,12 +25,7 @@ impl<const P: u64> Polynomial<P> {
         let mut result: FieldElement<P> = FieldElement::zero();
 
         for term in &self.terms {
-            let mut variablesevaluation = FieldElement::one();
-            for (index, variable) in values.iter().enumerate() {
-                variablesevaluation =
-                    variablesevaluation * variable.pow(term.exponents[index] as u64);
-            }
-            result = result + (term.coefficient * variablesevaluation);
+            result = result + term.evaluate(&values);
         }
 
         Ok(result)

@@ -13,6 +13,16 @@ impl<const P: u64> Monomial<P> {
     pub fn is_multilinear(&self) -> bool {
         self.exponents.iter().all(|&e| e <= 1)
     }
+
+    pub fn evaluate(&self, values: &Vec<FieldElement<P>>) -> FieldElement<P> {
+        let mut result: FieldElement<P> = self.coefficient;
+
+        for (index, exponent) in self.exponents.iter().enumerate() {
+            result = result * values[index].pow(*exponent as u64);
+        }
+
+        result
+    }
 }
 
 // Display
