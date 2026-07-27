@@ -1,3 +1,7 @@
+use std::fmt::Display;
+
+use itertools::Itertools;
+
 use crate::{
     error::PolynomialError, field::field_element::FieldElement, polynomial::polynomial::Polynomial,
 };
@@ -22,5 +26,12 @@ impl<const P: u64> MultilinearPolynomial<P> {
         values: Vec<FieldElement<P>>,
     ) -> Result<FieldElement<P>, PolynomialError> {
         self.polynomial.evaluate(values)
+    }
+}
+
+// Display
+impl<const P: u64> Display for MultilinearPolynomial<P> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.polynomial.terms.iter().join(""))
     }
 }

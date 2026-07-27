@@ -108,5 +108,8 @@ fn main() {
         .evaluate(vec![field_element_subtract, field_element_divided])
         .unwrap();
 
-    println!("Evaluate multilinear polynomial at  Result : {}", result);
+    println!(
+        "Evaluate multilinear polynomial {} at ({},{}) Result : {}",
+        multilinear, field_element_subtract, field_element_divided, result
+    );
 }
