@@ -17,7 +17,7 @@ impl<const P: u64> MultilinearPolynomial<P> {
         }
 
         if polynomial.terms.iter().all(|term| term.is_constant()) {
-            return Err(PolynomialError::NotMultilinear);
+            return Err(PolynomialError::ConstantPolynomial);
         }
 
         Ok(Self { polynomial })
