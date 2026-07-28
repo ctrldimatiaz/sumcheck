@@ -14,6 +14,10 @@ impl<const P: u64> Monomial<P> {
         self.exponents.iter().all(|&e| e <= 1)
     }
 
+    pub fn is_constant(&self) -> bool {
+        self.exponents.iter().all(|&e| e == 0)
+    }
+
     pub fn evaluate(&self, values: &Vec<FieldElement<P>>) -> FieldElement<P> {
         let mut result: FieldElement<P> = self.coefficient;
 

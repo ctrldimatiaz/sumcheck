@@ -12,10 +12,12 @@ pub struct MultilinearPolynomial<const P: u64> {
 
 impl<const P: u64> MultilinearPolynomial<P> {
     pub fn new(polynomial: Polynomial<P>) -> Result<Self, PolynomialError> {
-        for term in &polynomial.terms {
-            if !term.is_multilinear() {
-                return Err(PolynomialError::NotMultilinear);
-            }
+        if polynomial.terms.iter().any(|term| !term.is_multilinear()) {
+            return Err(PolynomialError::NotMultilinear);
+        }
+
+        if polynomial.terms.iter().all(|term| term.is_constant()) {
+            return Err(PolynomialError::NotMultilinear);
         }
 
         Ok(Self { polynomial })
