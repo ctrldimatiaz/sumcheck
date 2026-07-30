@@ -15,7 +15,7 @@ impl<const P: u64> Monomial<P> {
     }
 
     pub fn is_constant(&self) -> bool {
-        self.exponents.iter().all(|&e| e == 0)
+        self.exponents.iter().all(|&e| e == 0) || self.coefficient == FieldElement::zero()
     }
 
     pub fn get_number_of_terms(&self) -> usize {
@@ -78,5 +78,39 @@ mod tests {
             monomial.evaluate(&vec![F17::zero(), F17::zero()]),
             FieldElement::zero()
         );
+    }
+
+    #[test]
+    fn test_monomial_multilinearity() {
+        let coeff = FieldElement::from_u64(5u64);
+        let monomial = M17::new(coeff, vec![1, 1]);
+        let monomial_two = M17::new(coeff, vec![0, 1]);
+        let monomial_three = M17::new(coeff, vec![1, 0]);
+        let monomial_four = M17::new(coeff, vec![0, 0]);
+
+        let monomial_not_multilinear = M17::new(FieldElement::zero(), vec![4, 0]);
+
+        assert!(monomial.is_multilinear());
+        assert!(monomial_two.is_multilinear());
+        assert!(monomial_three.is_multilinear());
+        assert!(monomial_four.is_multilinear());
+        assert!(!monomial_not_multilinear.is_multilinear());
+    }
+
+    #[test]
+    fn test_monomial_constantness() {
+        let coeff = FieldElement::from_u64(5u64);
+        let monomial = M17::new(coeff, vec![1, 1]);
+        let monomial_two = M17::new(coeff, vec![0, 1]);
+        let monomial_three = M17::new(coeff, vec![1, 0]);
+        let monomial_four = M17::new(coeff, vec![0, 0]);
+
+        let monomial_not_multilinear = M17::new(FieldElement::zero(), vec![4, 0]);
+
+        assert!(!monomial.is_constant());
+        assert!(!monomial_two.is_constant());
+        assert!(!monomial_three.is_constant());
+        assert!(monomial_four.is_constant());
+        assert!(monomial_not_multilinear.is_constant());
     }
 }
