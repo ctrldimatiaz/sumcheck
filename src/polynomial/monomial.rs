@@ -69,4 +69,14 @@ mod tests {
     use super::*;
 
     type M17 = Monomial<17>;
+    type F17 = FieldElement<17>;
+
+    #[test]
+    fn test_zero_evaluation() {
+        let monomial = M17::new(FieldElement::zero(), vec![1, 2]);
+        assert_eq!(
+            monomial.evaluate(&vec![F17::zero(), F17::zero()]),
+            FieldElement::zero()
+        );
+    }
 }

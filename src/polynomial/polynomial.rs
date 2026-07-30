@@ -21,7 +21,7 @@ impl<const P: u64> Polynomial<P> {
     }
 
     pub fn is_constant(&self) -> bool {
-        self.terms.iter().any(|term| !term.is_constant())
+        self.terms.iter().all(|term| !term.is_constant())
     }
 
     pub fn get_readable_polynomial(&self) -> String {
