@@ -1,9 +1,11 @@
+use itertools::Itertools;
+
 use crate::{
     error::PolynomialError, field::field_element::FieldElement, polynomial::monomial::Monomial,
 };
 
 pub struct Polynomial<const P: u64> {
-    pub terms: Vec<Monomial<P>>,
+    terms: Vec<Monomial<P>>,
 }
 
 impl<const P: u64> Polynomial<P> {
@@ -14,11 +16,27 @@ impl<const P: u64> Polynomial<P> {
         Ok(Self { terms: values })
     }
 
+    pub fn is_multilinear(&self) -> bool {
+        self.terms.iter().any(|term| !term.is_multilinear())
+    }
+
+    pub fn is_constant(&self) -> bool {
+        self.terms.iter().any(|term| !term.is_constant())
+    }
+
+    pub fn get_readable_polynomial(&self) -> String {
+        self.terms.iter().join(" + ")
+    }
+
     pub fn evaluate(
         &self,
         values: Vec<FieldElement<P>>,
     ) -> Result<FieldElement<P>, PolynomialError> {
-        if self.terms.iter().any(|t| t.exponents.len() != values.len()) {
+        if self
+            .terms
+            .iter()
+            .any(|t| t.get_number_of_terms() != values.len())
+        {
             return Err(PolynomialError::DifferentVariableCounts);
         }
 

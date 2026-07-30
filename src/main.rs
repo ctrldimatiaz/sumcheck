@@ -91,14 +91,8 @@ fn main() {
     );
 
     let polynomial: Polynomial<17> = Polynomial::new(vec![
-        Monomial {
-            coefficient: FieldElement::from_u64(5),
-            exponents: vec![0, 0],
-        },
-        Monomial {
-            coefficient: FieldElement::from_u64(5),
-            exponents: vec![1, 1],
-        },
+        Monomial::new(FieldElement::from_u64(5), vec![0, 0]),
+        Monomial::new(FieldElement::from_u64(5), vec![1, 1]),
     ])
     .unwrap();
 

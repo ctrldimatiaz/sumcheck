@@ -5,8 +5,8 @@ use itertools::Itertools;
 use crate::FieldElement;
 
 pub struct Monomial<const P: u64> {
-    pub coefficient: FieldElement<P>,
-    pub exponents: Vec<usize>,
+    coefficient: FieldElement<P>,
+    exponents: Vec<usize>,
 }
 
 impl<const P: u64> Monomial<P> {
@@ -18,6 +18,10 @@ impl<const P: u64> Monomial<P> {
         self.exponents.iter().all(|&e| e == 0)
     }
 
+    pub fn get_number_of_terms(&self) -> usize {
+        self.exponents.len()
+    }
+
     pub fn evaluate(&self, values: &Vec<FieldElement<P>>) -> FieldElement<P> {
         let mut result: FieldElement<P> = self.coefficient;
 
@@ -26,6 +30,13 @@ impl<const P: u64> Monomial<P> {
         }
 
         result
+    }
+
+    pub fn new(coefficient: FieldElement<P>, exponents: Vec<usize>) -> Self {
+        Monomial {
+            coefficient,
+            exponents,
+        }
     }
 }
 
@@ -51,4 +62,11 @@ impl<const P: u64> Display for Monomial<P> {
                 .join("")
         )
     }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    type M17 = Monomial<17>;
 }

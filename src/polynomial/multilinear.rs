@@ -1,7 +1,5 @@
 use std::fmt::Display;
 
-use itertools::Itertools;
-
 use crate::{
     error::PolynomialError, field::field_element::FieldElement, polynomial::polynomial::Polynomial,
 };
@@ -12,11 +10,11 @@ pub struct MultilinearPolynomial<const P: u64> {
 
 impl<const P: u64> MultilinearPolynomial<P> {
     pub fn new(polynomial: Polynomial<P>) -> Result<Self, PolynomialError> {
-        if polynomial.terms.iter().any(|term| !term.is_multilinear()) {
+        if polynomial.is_multilinear() {
             return Err(PolynomialError::NotMultilinear);
         }
 
-        if polynomial.terms.iter().all(|term| term.is_constant()) {
+        if polynomial.is_constant() {
             return Err(PolynomialError::ConstantPolynomial);
         }
 
@@ -34,6 +32,6 @@ impl<const P: u64> MultilinearPolynomial<P> {
 // Display
 impl<const P: u64> Display for MultilinearPolynomial<P> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.polynomial.terms.iter().join(" + "))
+        write!(f, "{}", self.polynomial.get_readable_polynomial())
     }
 }
