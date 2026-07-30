@@ -10,7 +10,7 @@ Note: This project is being developed with the assistance of ChatGPT, more speci
 
 ## Installation
 
-I am using Rust because it is widely use in Cryptography area and I want to deepen my knowledge in it.
+I am using Rust because it is widely used in Cryptography area and I want to deepen my knowledge in it.
 
 Make sure you have Rust Compiler and Cargo installed. Once installed, you may run the following command to setup the project:
 
