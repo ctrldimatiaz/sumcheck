@@ -11,7 +11,7 @@ pub struct Monomial<const P: u64> {
 
 impl<const P: u64> Monomial<P> {
     pub fn is_multilinear(&self) -> bool {
-        self.exponents.iter().all(|&e| e <= 1)
+        self.exponents.iter().all(|&e| e <= 1) || self.coefficient == FieldElement::zero()
     }
 
     pub fn is_constant(&self) -> bool {
