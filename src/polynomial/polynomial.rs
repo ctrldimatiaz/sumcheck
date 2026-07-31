@@ -36,7 +36,7 @@ impl<const P: u64> Polynomial<P> {
 
     pub fn evaluate(
         &self,
-        values: Vec<FieldElement<P>>,
+        values: &Vec<FieldElement<P>>,
     ) -> Result<FieldElement<P>, PolynomialError> {
         //this must be reviewed because we might have monomials with different number of
         //Ex.: 5x1x2 + 7x1x3x5
@@ -67,7 +67,12 @@ mod tests {
     #[test]
     fn test_empty_polynomial() {
         let polynomial = P17::new(vec![]).unwrap_err();
+        let multilinear_polynomial = P17::new(vec![
+            Monomial::new(FieldElement::from_u64(5), vec![0, 0]),
+            Monomial::new(FieldElement::from_u64(5), vec![1, 1]),
+        ]);
 
+        assert!(multilinear_polynomial.is_ok());
         assert_eq!(polynomial, PolynomialError::EmptyPolynomial);
     }
 
@@ -87,5 +92,51 @@ mod tests {
 
         assert!(constant_polynomial.is_constant());
         assert!(zerocoeff_constant_polynomial.is_constant());
+    }
+
+    #[test]
+    fn test_polynomial_multilinearity() {
+        let multilinear_polynomial = P17::new(vec![
+            Monomial::new(FieldElement::from_u64(5), vec![0, 0]),
+            Monomial::new(FieldElement::from_u64(5), vec![1, 1]),
+        ])
+        .unwrap();
+
+        let not_multilinear_polynomial = P17::new(vec![
+            Monomial::new(FieldElement::from_u64(5), vec![0, 4]),
+            Monomial::new(FieldElement::from_u64(10), vec![0, 0]),
+        ])
+        .unwrap();
+
+        assert!(!multilinear_polynomial.is_constant());
+        assert!(not_multilinear_polynomial.is_multilinear());
+    }
+
+    #[test]
+    fn test_polynomial_evaluation() {
+        //0
+        let zero_multilinear_polynomial = P17::new(vec![
+            Monomial::new(FieldElement::from_u64(0), vec![0, 0]),
+            Monomial::new(FieldElement::from_u64(0), vec![1, 1]),
+        ])
+        .unwrap();
+
+        //5x2⁴ + 10
+        let multilinear_polynomial = P17::new(vec![
+            Monomial::new(FieldElement::from_u64(5), vec![0, 4]),
+            Monomial::new(FieldElement::from_u64(10), vec![0, 0]),
+        ])
+        .unwrap();
+
+        let values = vec![FieldElement::from_u64(5u64), FieldElement::from_u64(2u64)];
+
+        assert_eq!(
+            zero_multilinear_polynomial.evaluate(&values).unwrap(),
+            FieldElement::zero()
+        );
+        assert_eq!(
+            multilinear_polynomial.evaluate(&values).unwrap(),
+            FieldElement::from_u64(5u64)
+        );
     }
 }

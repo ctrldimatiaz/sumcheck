@@ -25,7 +25,7 @@ impl<const P: u64> MultilinearPolynomial<P> {
         &self,
         values: Vec<FieldElement<P>>,
     ) -> Result<FieldElement<P>, PolynomialError> {
-        self.polynomial.evaluate(values)
+        self.polynomial.evaluate(&values)
     }
 }
 
