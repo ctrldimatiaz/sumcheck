@@ -1,8 +1,7 @@
 use crate::{
     field::field_element::FieldElement,
     polynomial::{
-        monomial::Monomial, multilinear::MultilinearPolynomial,
-        multivariate::MultivariatePolynomial, polynomial::Polynomial,
+        monomial::Monomial, multilinear::MultilinearPolynomial, polynomial::Polynomial,
         univariate::UnivariatePolynomial,
     },
 };

@@ -4,6 +4,7 @@ use crate::{
     error::PolynomialError, field::field_element::FieldElement, polynomial::monomial::Monomial,
 };
 
+#[derive(Debug, Clone, PartialEq)]
 pub struct Polynomial<const P: u64> {
     terms: Vec<Monomial<P>>,
 }
@@ -22,11 +23,11 @@ impl<const P: u64> Polynomial<P> {
     }
 
     pub fn is_multilinear(&self) -> bool {
-        self.terms.iter().any(|term| !term.is_multilinear())
+        self.terms.iter().any(|term| term.is_multilinear())
     }
 
     pub fn is_constant(&self) -> bool {
-        self.terms.iter().all(|term| !term.is_constant())
+        self.terms.iter().all(|term| term.is_constant())
     }
 
     pub fn get_readable_polynomial(&self) -> String {
@@ -54,5 +55,37 @@ impl<const P: u64> Polynomial<P> {
         }
 
         Ok(result)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    type P17 = Polynomial<17>;
+
+    #[test]
+    fn test_empty_polynomial() {
+        let polynomial = P17::new(vec![]).unwrap_err();
+
+        assert_eq!(polynomial, PolynomialError::EmptyPolynomial);
+    }
+
+    #[test]
+    fn test_polynomial_constantness() {
+        let zerocoeff_constant_polynomial = P17::new(vec![
+            Monomial::new(FieldElement::from_u64(5), vec![0, 0]),
+            Monomial::new(FieldElement::from_u64(0), vec![1, 1]),
+        ])
+        .unwrap();
+
+        let constant_polynomial = P17::new(vec![
+            Monomial::new(FieldElement::from_u64(5), vec![0, 0]),
+            Monomial::new(FieldElement::from_u64(10), vec![0, 0]),
+        ])
+        .unwrap();
+
+        assert!(constant_polynomial.is_constant());
+        assert!(zerocoeff_constant_polynomial.is_constant());
     }
 }

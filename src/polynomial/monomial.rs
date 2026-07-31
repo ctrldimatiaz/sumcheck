@@ -4,6 +4,7 @@ use itertools::Itertools;
 
 use crate::FieldElement;
 
+#[derive(Debug, Clone, PartialEq)]
 pub struct Monomial<const P: u64> {
     coefficient: FieldElement<P>,
     exponents: Vec<usize>,
