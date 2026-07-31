@@ -54,9 +54,9 @@ impl<const P: u64> Display for Monomial<P> {
                     if exp == 0 {
                         String::new()
                     } else if exp == 1 {
-                        format!("x{}", index)
+                        format!("x{}", index + 1)
                     } else {
-                        format!("x{}^{}", index, exp)
+                        format!("x{}^{}", index + 1, exp)
                     }
                 })
                 .join("")
@@ -115,5 +115,13 @@ mod tests {
         assert!(!monomial_three.is_constant());
         assert!(monomial_four.is_constant());
         assert!(monomial_not_multilinear.is_constant());
+    }
+
+    #[test]
+    fn test_monomial_terms() {
+        let coeff = FieldElement::from_u64(5u64);
+        let monomial = M17::new(coeff, vec![1, 1]);
+
+        assert_eq!(monomial.get_number_of_terms(), 2);
     }
 }

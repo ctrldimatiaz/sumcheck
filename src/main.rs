@@ -65,31 +65,6 @@ fn main() {
         result
     );
 
-    let variables_vector: Vec<Vec<FieldElement<17>>> = vec![
-        vec![field_element, field_element_divided, field_element_subtract],
-        vec![
-            field_element_subtract,
-            field_element_subtract,
-            field_element_subtract,
-        ],
-    ];
-
-    let multivariate_polynomial = MultivariatePolynomial::from_variables_vec(variables_vector);
-
-    let result = multivariate_polynomial.evaluate(&vec![field_element, field_element_divided]);
-
-    println!(
-        "Evaluate polynomial {} {}x{}y {}x²{}y² at element (x,y) {} {}: Result : {}",
-        field_element * field_element_subtract,
-        field_element_divided,
-        field_element_subtract,
-        field_element_subtract,
-        field_element_subtract,
-        field_element,
-        field_element_divided,
-        result
-    );
-
     let polynomial: Polynomial<17> = Polynomial::new(vec![
         Monomial::new(FieldElement::from_u64(5), vec![0, 0]),
         Monomial::new(FieldElement::from_u64(5), vec![1, 1]),

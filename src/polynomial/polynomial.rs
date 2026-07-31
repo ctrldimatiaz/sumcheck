@@ -13,6 +13,11 @@ impl<const P: u64> Polynomial<P> {
         if values.is_empty() {
             return Err(PolynomialError::EmptyPolynomial);
         }
+
+        if !values.iter().map(|m| m.get_number_of_terms()).all_equal() {
+            return Err(PolynomialError::DifferentVariableCounts);
+        }
+
         Ok(Self { terms: values })
     }
 
@@ -32,6 +37,8 @@ impl<const P: u64> Polynomial<P> {
         &self,
         values: Vec<FieldElement<P>>,
     ) -> Result<FieldElement<P>, PolynomialError> {
+        //this must be reviewed because we might have monomials with different number of
+        //Ex.: 5x1x2 + 7x1x3x5
         if self
             .terms
             .iter()
