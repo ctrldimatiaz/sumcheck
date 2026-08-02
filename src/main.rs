@@ -10,6 +10,7 @@ use env_logger;
 mod error;
 mod field;
 mod polynomial;
+mod protocol;
 
 fn main() {
     env_logger::init();
