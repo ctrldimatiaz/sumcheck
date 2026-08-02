@@ -23,7 +23,7 @@ impl<const P: u64> Polynomial<P> {
     }
 
     pub fn is_multilinear(&self) -> bool {
-        self.terms.iter().any(|term| term.is_multilinear())
+        self.terms.iter().all(|term| term.is_multilinear())
     }
 
     pub fn is_constant(&self) -> bool {
@@ -108,8 +108,8 @@ mod tests {
         ])
         .unwrap();
 
-        assert!(!multilinear_polynomial.is_constant());
-        assert!(not_multilinear_polynomial.is_multilinear());
+        assert!(multilinear_polynomial.is_multilinear());
+        assert!(!not_multilinear_polynomial.is_multilinear());
     }
 
     #[test]

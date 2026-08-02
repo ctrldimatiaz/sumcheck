@@ -4,13 +4,14 @@ use crate::{
     error::PolynomialError, field::field_element::FieldElement, polynomial::polynomial::Polynomial,
 };
 
+#[derive(Debug, Clone, PartialEq)]
 pub struct MultilinearPolynomial<const P: u64> {
     polynomial: Polynomial<P>,
 }
 
 impl<const P: u64> MultilinearPolynomial<P> {
     pub fn new(polynomial: Polynomial<P>) -> Result<Self, PolynomialError> {
-        if polynomial.is_multilinear() {
+        if !polynomial.is_multilinear() {
             return Err(PolynomialError::NotMultilinear);
         }
 
@@ -33,5 +34,41 @@ impl<const P: u64> MultilinearPolynomial<P> {
 impl<const P: u64> Display for MultilinearPolynomial<P> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.polynomial.get_readable_polynomial())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::polynomial::monomial::Monomial;
+
+    use super::*;
+
+    type M17 = MultilinearPolynomial<17>;
+    type P17 = Polynomial<17>;
+
+    #[test]
+    fn test_multilinear_polynomial_constantness() {
+        let polynomial = P17::new(vec![
+            Monomial::new(FieldElement::from_u64(5), vec![0, 0]),
+            Monomial::new(FieldElement::from_u64(5), vec![0, 0]),
+        ])
+        .unwrap();
+
+        let multilinear = M17::new(polynomial).unwrap_err();
+
+        assert_eq!(multilinear, PolynomialError::ConstantPolynomial);
+    }
+
+    #[test]
+    fn test_multilinear_polynomial_multilinearity() {
+        let poly = P17::new(vec![
+            Monomial::new(FieldElement::from_u64(5), vec![0, 0]),
+            Monomial::new(FieldElement::from_u64(5), vec![2, 2]),
+        ])
+        .unwrap();
+
+        let multilinear = M17::new(poly).unwrap_err();
+
+        assert_eq!(multilinear, PolynomialError::NotMultilinear);
     }
 }
