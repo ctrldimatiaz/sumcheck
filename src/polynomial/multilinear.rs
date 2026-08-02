@@ -71,4 +71,21 @@ mod tests {
 
         assert_eq!(multilinear, PolynomialError::NotMultilinear);
     }
+
+    #[test]
+    fn test_multilinear_polynomial_evaluation() {
+        let poly = P17::new(vec![
+            Monomial::new(FieldElement::from_u64(5), vec![0, 1]),
+            Monomial::new(FieldElement::from_u64(5), vec![1, 1]),
+        ])
+        .unwrap();
+
+        let values = vec![FieldElement::from_u64(0), FieldElement::from_u64(5)];
+
+        let multilinear = M17::new(poly).unwrap();
+
+        let result = multilinear.evaluate(values).unwrap();
+
+        assert_eq!(result, FieldElement::from_u64(8));
+    }
 }

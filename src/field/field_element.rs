@@ -155,7 +155,6 @@ mod tests {
 
     use super::*;
 
-    // Define a concrete field for testing: F_13
     type F13 = FieldElement<13>;
     type F23 = FieldElement<23>;
 
