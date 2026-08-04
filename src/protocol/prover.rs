@@ -9,6 +9,10 @@ impl<const P: u64> Prover<P> {
         Prover { polynomial }
     }
 
+    pub fn claimed_sum(&self) -> FieldElement<P> {
+        self.polynomial.compute_sum()
+    }
+
     pub fn compute_round(&self, _round: &Vec<FieldElement<P>>) -> FieldElement<P> {
         FieldElement::one()
     }

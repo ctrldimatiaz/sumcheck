@@ -5,3 +5,8 @@ pub enum PolynomialError {
     EmptyPolynomial,
     ConstantPolynomial,
 }
+
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub enum ProtocolError {
+    InvalidClaim,
+}

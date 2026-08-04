@@ -61,10 +61,10 @@ impl<const P: u64> Polynomial<P> {
         Ok(result)
     }
 
-    pub fn reduce_polynomial(&self, round: &Vec<FieldElement<P>>) -> Polynomial<P> {
+    pub fn reduce_polynomial(&self, fixed_terms: &Vec<FieldElement<P>>) -> Polynomial<P> {
         let mut reduced_polynomial = Polynomial::new(vec![]).unwrap();
 
-        let no_of_terms_not_fixed = self.terms.len() - (round.len() + 1);
+        let no_of_terms_not_fixed = self.terms.len() - (fixed_terms.len() + 1);
 
         let number_of_combinations = 2_u64.pow(no_of_terms_not_fixed as u32);
 
@@ -73,6 +73,22 @@ impl<const P: u64> Polynomial<P> {
         }
 
         reduced_polynomial
+    }
+
+    pub fn compute_sum(&self) -> FieldElement<P> {
+        let mut result = FieldElement::zero();
+        let number_of_combinations = 2_u64.pow(self.terms.len() as u32);
+
+        for i in 0..number_of_combinations {
+            let values = number_to_bits_vec(i, number_of_combinations as usize)
+                .iter()
+                .map(|combination| FieldElement::from_u64(*combination))
+                .collect();
+
+            result = result + self.evaluate(&values).unwrap();
+        }
+
+        result
     }
 
     fn evaluate_with_fixing_term(&self, values: &Vec<FieldElement<P>>) -> Polynomial<P> {

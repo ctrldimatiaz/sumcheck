@@ -33,6 +33,10 @@ impl<const P: u64> MultilinearPolynomial<P> {
     pub fn reduce_polynomial(&self, round: &Vec<FieldElement<P>>) -> Polynomial<P> {
         self.polynomial.reduce_polynomial(round)
     }
+
+    pub fn compute_sum(&self) -> FieldElement<P> {
+        self.polynomial.compute_sum()
+    }
 }
 
 // Display
