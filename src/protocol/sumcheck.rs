@@ -11,6 +11,16 @@ impl<const P: u64> SumCheck<P> {
 
         self.verifier = Verifier::new(h1);
 
+        let mut round = vec![];
+
+        let g1 = self.prover.compute_round(&round).unwrap();
+
+        let r1 = self.verifier.check_round(g1).unwrap();
+
+        round.push(r1);
+
+        println!("{}", r1);
+
         true
     }
 }

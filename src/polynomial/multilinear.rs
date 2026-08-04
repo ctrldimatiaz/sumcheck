@@ -30,7 +30,10 @@ impl<const P: u64> MultilinearPolynomial<P> {
         self.polynomial.evaluate(&values)
     }
 
-    pub fn reduce_polynomial(&self, round: &Vec<FieldElement<P>>) -> Polynomial<P> {
+    pub fn reduce_polynomial(
+        &self,
+        round: &Vec<FieldElement<P>>,
+    ) -> Result<Polynomial<P>, PolynomialError> {
         self.polynomial.reduce_polynomial(round)
     }
 

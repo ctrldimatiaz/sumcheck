@@ -1,3 +1,5 @@
+use rand::RngExt;
+
 use crate::{
     field::field_element::FieldElement, helpers::error::ProtocolError,
     polynomial::polynomial::Polynomial,
@@ -24,6 +26,10 @@ impl<const P: u64> Verifier<P> {
     }
 
     fn generate_rn(&self) -> FieldElement<P> {
-        FieldElement::zero()
+        let mut rng = rand::rng();
+
+        let rng_field_value = rng.random_range(0..P);
+
+        FieldElement::from_u64(rng_field_value)
     }
 }

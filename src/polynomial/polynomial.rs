@@ -61,18 +61,29 @@ impl<const P: u64> Polynomial<P> {
         Ok(result)
     }
 
-    pub fn reduce_polynomial(&self, fixed_terms: &Vec<FieldElement<P>>) -> Polynomial<P> {
-        let mut reduced_polynomial = Polynomial::new(vec![]).unwrap();
+    pub fn reduce_polynomial(
+        &self,
+        fixed_terms: &Vec<FieldElement<P>>,
+    ) -> Result<Polynomial<P>, PolynomialError> {
+        let mut monomials_evaluated: Vec<Monomial<P>> = vec![];
 
         let no_of_terms_not_fixed = self.terms.len() - (fixed_terms.len() + 1);
 
         let number_of_combinations = 2_u64.pow(no_of_terms_not_fixed as u32);
 
         for i in 0..number_of_combinations {
-            let _values = number_to_bits_vec(i, no_of_terms_not_fixed);
+            let values = number_to_bits_vec(i, no_of_terms_not_fixed)
+                .iter()
+                .map(|bit| FieldElement::from_u64(*bit))
+                .collect();
+
+            for monomial in &self.terms {
+                monomials_evaluated
+                    .push(monomial.evaluate_with_fixing_term(fixed_terms.len() as u64, &values));
+            }
         }
 
-        reduced_polynomial
+        Polynomial::new(monomials_evaluated)
     }
 
     pub fn compute_sum(&self) -> FieldElement<P> {
@@ -80,19 +91,15 @@ impl<const P: u64> Polynomial<P> {
         let number_of_combinations = 2_u64.pow(self.terms.len() as u32);
 
         for i in 0..number_of_combinations {
-            let values = number_to_bits_vec(i, number_of_combinations as usize)
+            let values = number_to_bits_vec(i, self.terms.len() as usize)
                 .iter()
-                .map(|combination| FieldElement::from_u64(*combination))
+                .map(|bit| FieldElement::from_u64(*bit))
                 .collect();
 
             result = result + self.evaluate(&values).unwrap();
         }
 
         result
-    }
-
-    fn evaluate_with_fixing_term(&self, values: &Vec<FieldElement<P>>) -> Polynomial<P> {
-        Polynomial::new(vec![]).unwrap()
     }
 }
 

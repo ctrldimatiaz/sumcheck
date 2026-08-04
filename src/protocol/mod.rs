@@ -1,3 +1,3 @@
-mod prover;
-mod sumcheck;
-mod verifier;
+pub mod prover;
+pub mod sumcheck;
+pub mod verifier;

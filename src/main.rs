@@ -7,6 +7,7 @@ use crate::{
 };
 use env_logger;
 
+mod examples;
 mod field;
 mod helpers;
 mod polynomial;

@@ -11,6 +11,13 @@ pub struct Monomial<const P: u64> {
 }
 
 impl<const P: u64> Monomial<P> {
+    pub fn new(coefficient: FieldElement<P>, exponents: Vec<usize>) -> Self {
+        Monomial {
+            coefficient,
+            exponents,
+        }
+    }
+
     pub fn is_multilinear(&self) -> bool {
         self.exponents.iter().all(|&e| e <= 1) || self.coefficient == FieldElement::zero()
     }
@@ -33,7 +40,26 @@ impl<const P: u64> Monomial<P> {
         result
     }
 
-    pub fn new(coefficient: FieldElement<P>, exponents: Vec<usize>) -> Self {
+    pub fn evaluate_with_fixing_term(
+        &self,
+        fixed_value: u64,
+        values: &Vec<FieldElement<P>>,
+    ) -> Monomial<P> {
+        let mut coefficient: FieldElement<P> = self.coefficient;
+        let mut result_exponent: usize = 0;
+
+        for (index, exponent) in self.exponents.iter().enumerate() {
+            if fixed_value == index as u64 {
+                if *exponent == 1 as usize {
+                    result_exponent = 1;
+                }
+            } else {
+                coefficient = coefficient * values[index].pow(*exponent as u64);
+            }
+        }
+
+        let exponents = vec![result_exponent];
+
         Monomial {
             coefficient,
             exponents,
