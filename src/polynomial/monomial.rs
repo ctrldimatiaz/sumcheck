@@ -54,7 +54,8 @@ impl<const P: u64> Monomial<P> {
                     result_exponent = 1;
                 }
             } else {
-                coefficient = coefficient * values[index].pow(*exponent as u64);
+                //we will have minus 1 variable in values
+                coefficient = coefficient * values[index - 1].pow(*exponent as u64);
             }
         }
 
