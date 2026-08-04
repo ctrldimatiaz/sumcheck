@@ -1,7 +1,9 @@
 use itertools::Itertools;
 
 use crate::{
-    error::PolynomialError, field::field_element::FieldElement, polynomial::monomial::Monomial,
+    field::field_element::FieldElement,
+    helpers::{error::PolynomialError, functions::number_to_bits_vec},
+    polynomial::monomial::Monomial,
 };
 
 #[derive(Debug, Clone, PartialEq)]
@@ -15,6 +17,9 @@ impl<const P: u64> Polynomial<P> {
             return Err(PolynomialError::EmptyPolynomial);
         }
 
+        // the terms must all be explicitly defined during initialization
+        // Ex.: 5x1x2 + 7x1x3x5
+        // 5[1,1,0,0,0] and 7[1,0,1,0,1]
         if !values.iter().map(|m| m.get_number_of_terms()).all_equal() {
             return Err(PolynomialError::DifferentVariableCounts);
         }
@@ -38,8 +43,7 @@ impl<const P: u64> Polynomial<P> {
         &self,
         values: &Vec<FieldElement<P>>,
     ) -> Result<FieldElement<P>, PolynomialError> {
-        //this must be reviewed because we might have monomials with different number of
-        //Ex.: 5x1x2 + 7x1x3x5
+        // We must check against the right number of values
         if self
             .terms
             .iter()
@@ -55,6 +59,24 @@ impl<const P: u64> Polynomial<P> {
         }
 
         Ok(result)
+    }
+
+    pub fn reduce_polynomial(&self, round: &Vec<FieldElement<P>>) -> Polynomial<P> {
+        let mut reduced_polynomial = Polynomial::new(vec![]).unwrap();
+
+        let no_of_terms_not_fixed = self.terms.len() - (round.len() + 1);
+
+        let number_of_combinations = 2_u64.pow(no_of_terms_not_fixed as u32);
+
+        for i in 0..number_of_combinations {
+            let _values = number_to_bits_vec(i, no_of_terms_not_fixed);
+        }
+
+        reduced_polynomial
+    }
+
+    fn evaluate_with_fixing_term(&self, values: &Vec<FieldElement<P>>) -> Polynomial<P> {
+        Polynomial::new(vec![]).unwrap()
     }
 }
 

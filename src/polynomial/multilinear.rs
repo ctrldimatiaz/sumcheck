@@ -1,7 +1,8 @@
 use std::fmt::Display;
 
 use crate::{
-    error::PolynomialError, field::field_element::FieldElement, polynomial::polynomial::Polynomial,
+    field::field_element::FieldElement, helpers::error::PolynomialError,
+    polynomial::polynomial::Polynomial,
 };
 
 #[derive(Debug, Clone, PartialEq)]
@@ -27,6 +28,10 @@ impl<const P: u64> MultilinearPolynomial<P> {
         values: Vec<FieldElement<P>>,
     ) -> Result<FieldElement<P>, PolynomialError> {
         self.polynomial.evaluate(&values)
+    }
+
+    pub fn reduce_polynomial(&self, round: &Vec<FieldElement<P>>) -> Polynomial<P> {
+        self.polynomial.reduce_polynomial(round)
     }
 }
 
