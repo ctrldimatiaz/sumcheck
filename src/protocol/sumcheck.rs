@@ -22,16 +22,19 @@ impl<const P: u64> SumCheck<P> {
 
         for i in 0..self.no_of_rounds {
             match self.prover.compute_round(&round) {
-                Ok(gn) => match self.verifier.check_round(&gn) {
-                    Ok(rn) => {
-                        info!("Computed round {} with gn {} and rn {}", i, gn, rn);
-                        round.push(rn);
+                Ok(gn) => {
+                    info!("Prover computed round {} with gn {}", i, gn);
+                    match self.verifier.check_round(&gn) {
+                        Ok(rn) => {
+                            info!("Verifier computed round {} with gn {} and rn {}", i, gn, rn);
+                            round.push(rn);
+                        }
+                        Err(e) => {
+                            error!("Error in verifier at round {} | {}", i, e);
+                            return false;
+                        }
                     }
-                    Err(e) => {
-                        error!("Error in verifier at round {} | {}", i, e);
-                        return false;
-                    }
-                },
+                }
                 Err(e) => {
                     error!("Error in prover at round {} | {}", i, e);
                     return false;

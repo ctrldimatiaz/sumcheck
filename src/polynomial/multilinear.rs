@@ -36,7 +36,6 @@ impl<const P: u64> MultilinearPolynomial<P> {
         &self,
         round: &Vec<FieldElement<P>>,
     ) -> Result<Polynomial<P>, PolynomialError> {
-        println!("{}", round.iter().join(" round: "));
         self.polynomial.reduce_polynomial(round)
     }
 

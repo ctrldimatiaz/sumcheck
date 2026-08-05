@@ -1,7 +1,7 @@
 use std::fmt::Display;
 
 use itertools::Itertools;
-use log::{debug, info};
+use log::debug;
 
 use crate::FieldElement;
 
@@ -69,7 +69,9 @@ impl<const P: u64> Monomial<P> {
             }
         }
 
-        let exponents = vec![result_exponent];
+        let mut exponents = vec![0; fixed_value as usize];
+
+        exponents.push(result_exponent);
 
         Monomial {
             coefficient,
