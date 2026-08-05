@@ -28,12 +28,12 @@ impl<const P: u64> SumCheck<P> {
                         round.push(rn);
                     }
                     Err(e) => {
-                        error!("Error in verifier at round {} {}", i, e);
+                        error!("Error in verifier at round {} | {}", i, e);
                         return false;
                     }
                 },
                 Err(e) => {
-                    error!("{}", e);
+                    error!("Error in prover at round {} | {}", i, e);
                     return false;
                 }
             }

@@ -29,7 +29,7 @@ pub enum ProtocolError {
 impl fmt::Display for ProtocolError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::InvalidClaim => write!(f, "Polynomial is not multilinear"),
+            Self::InvalidClaim => write!(f, "Invalid Claim."),
         }
     }
 }
