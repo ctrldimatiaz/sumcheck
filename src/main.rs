@@ -1,4 +1,5 @@
 use crate::{examples::toyexample::ToyExample, field::field_element::FieldElement};
+use env_logger::Env;
 use log::{error, info};
 
 mod examples;
@@ -8,7 +9,9 @@ mod polynomial;
 mod protocol;
 
 fn main() {
-    env_logger::init();
+    let env = Env::default().filter_or("RUST_LOG", "debug");
+
+    env_logger::init_from_env(env);
 
     info!("Starting toy example.");
 

@@ -1,6 +1,7 @@
 use std::fmt::Display;
 
 use itertools::Itertools;
+use log::{debug, info};
 
 use crate::FieldElement;
 
@@ -45,6 +46,12 @@ impl<const P: u64> Monomial<P> {
         fixed_value: u64,
         values: &Vec<FieldElement<P>>,
     ) -> Monomial<P> {
+        debug!(
+            "Received values at monomial evaluation: {} and index {}",
+            values.iter().join(" , "),
+            fixed_value,
+        );
+
         let mut coefficient: FieldElement<P> = self.coefficient;
         let mut result_exponent: usize = 0;
 
@@ -55,7 +62,10 @@ impl<const P: u64> Monomial<P> {
                 }
             } else {
                 //we will have minus 1 variable in values
-                coefficient = coefficient * values[index - 1].pow(*exponent as u64);
+
+                let values_index = if index > 0 { index - 1 } else { index };
+
+                coefficient = coefficient * values[values_index].pow(*exponent as u64);
             }
         }
 

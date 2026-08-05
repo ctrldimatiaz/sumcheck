@@ -15,7 +15,10 @@ impl<const P: u64> Verifier<P> {
         Verifier { claimed_sum }
     }
 
-    pub fn check_round(&self, polynomial: Polynomial<P>) -> Result<FieldElement<P>, ProtocolError> {
+    pub fn check_round(
+        &self,
+        polynomial: &Polynomial<P>,
+    ) -> Result<FieldElement<P>, ProtocolError> {
         let evaluated_polynomial = polynomial.evaluate(&vec![FieldElement::zero()]).unwrap()
             + polynomial.evaluate(&vec![FieldElement::one()]).unwrap();
 

@@ -1,4 +1,7 @@
+use std::fmt::Display;
+
 use itertools::Itertools;
+use log::debug;
 
 use crate::{
     field::field_element::FieldElement,
@@ -71,6 +74,11 @@ impl<const P: u64> Polynomial<P> {
 
         let number_of_combinations = 2_u64.pow(no_of_terms_not_fixed as u32);
 
+        debug!(
+            "Number of combinations: {} and no_of_terms_not_fixed {}",
+            number_of_combinations, no_of_terms_not_fixed,
+        );
+
         for i in 0..number_of_combinations {
             let mut values: Vec<FieldElement<P>> = fixed_terms.clone();
 
@@ -103,6 +111,13 @@ impl<const P: u64> Polynomial<P> {
         }
 
         result
+    }
+}
+
+// Display
+impl<const P: u64> Display for Polynomial<P> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.get_readable_polynomial())
     }
 }
 

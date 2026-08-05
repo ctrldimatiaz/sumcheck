@@ -1,4 +1,4 @@
-use log::error;
+use log::{error, info};
 
 use crate::protocol::{prover::Prover, verifier::Verifier};
 
@@ -22,8 +22,9 @@ impl<const P: u64> SumCheck<P> {
 
         for i in 0..self.no_of_rounds {
             match self.prover.compute_round(&round) {
-                Ok(gn) => match self.verifier.check_round(gn) {
+                Ok(gn) => match self.verifier.check_round(&gn) {
                     Ok(rn) => {
+                        info!("Computed round {} with gn {} and rn {}", i, gn, rn);
                         round.push(rn);
                     }
                     Err(e) => {
