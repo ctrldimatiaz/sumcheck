@@ -55,7 +55,7 @@ impl<const P: u64> Polynomial<P> {
         let mut result: FieldElement<P> = FieldElement::zero();
 
         for term in &self.terms {
-            result = result + term.evaluate(&values);
+            result = result + term.evaluate(values);
         }
 
         Ok(result)
@@ -72,10 +72,13 @@ impl<const P: u64> Polynomial<P> {
         let number_of_combinations = 2_u64.pow(no_of_terms_not_fixed as u32);
 
         for i in 0..number_of_combinations {
-            let values = number_to_bits_vec(i, no_of_terms_not_fixed)
-                .iter()
-                .map(|bit| FieldElement::from_u64(*bit))
-                .collect();
+            let mut values: Vec<FieldElement<P>> = fixed_terms.clone();
+
+            values.extend(
+                number_to_bits_vec(i, no_of_terms_not_fixed)
+                    .iter()
+                    .map(|bit| FieldElement::from_u64(*bit)),
+            );
 
             for monomial in &self.terms {
                 monomials_evaluated
@@ -91,7 +94,7 @@ impl<const P: u64> Polynomial<P> {
         let number_of_combinations = 2_u64.pow(self.terms.len() as u32);
 
         for i in 0..number_of_combinations {
-            let values = number_to_bits_vec(i, self.terms.len() as usize)
+            let values = number_to_bits_vec(i, self.terms.len())
                 .iter()
                 .map(|bit| FieldElement::from_u64(*bit))
                 .collect();

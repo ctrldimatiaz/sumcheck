@@ -50,7 +50,7 @@ impl<const P: u64> Monomial<P> {
 
         for (index, exponent) in self.exponents.iter().enumerate() {
             if fixed_value == index as u64 {
-                if *exponent == 1 as usize {
+                if *exponent == 1 {
                     result_exponent = 1;
                 }
             } else {
