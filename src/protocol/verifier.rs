@@ -1,3 +1,5 @@
+use itertools::Itertools;
+use log::debug;
 use rand::RngExt;
 
 use crate::{
@@ -5,7 +7,7 @@ use crate::{
     polynomial::polynomial::Polynomial,
 };
 
-//verifier will check the claimed_sum on each round
+//the verifier will only check the claimed_sum on round one
 pub struct Verifier<const P: u64> {
     claimed_sum: FieldElement<P>,
 }
@@ -18,13 +20,45 @@ impl<const P: u64> Verifier<P> {
     pub fn check_round(
         &self,
         polynomial: &Polynomial<P>,
+        round_rn: Option<FieldElement<P>>,
+        polynomial_previousgn: Option<Polynomial<P>>,
     ) -> Result<FieldElement<P>, ProtocolError> {
-        let evaluated_polynomial = polynomial.evaluate(&vec![FieldElement::zero()]).unwrap()
-            + polynomial.evaluate(&vec![FieldElement::one()]).unwrap();
+        debug!(
+            "Polynomial at verifier {} with terms {}",
+            polynomial,
+            polynomial.get_number_of_terms()
+        );
 
-        if self.claimed_sum == evaluated_polynomial {
-            return Ok(self.generate_rn());
+        let mut values_zero = vec![FieldElement::<P>::zero(); polynomial.get_number_of_terms() - 1];
+        let mut values_one = vec![FieldElement::<P>::zero(); polynomial.get_number_of_terms() - 1];
+
+        values_zero.push(FieldElement::zero());
+        values_one.push(FieldElement::one());
+
+        let evaluated_polynomial =
+            polynomial.evaluate(&values_zero).unwrap() + polynomial.evaluate(&values_one).unwrap();
+
+        match round_rn {
+            Some(rn) => {
+                let previous_gn = polynomial_previousgn.unwrap();
+
+                values_zero =
+                    vec![FieldElement::<P>::zero(); previous_gn.get_number_of_terms() - 1];
+                values_zero.push(rn);
+
+                let grn = previous_gn.evaluate(&values_zero).unwrap();
+
+                if grn == evaluated_polynomial {
+                    return Ok(self.generate_rn());
+                }
+            }
+            None => {
+                if self.claimed_sum == evaluated_polynomial {
+                    return Ok(self.generate_rn());
+                }
+            }
         }
+
         Err(ProtocolError::InvalidClaim)
     }
 

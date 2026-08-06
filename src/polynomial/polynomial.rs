@@ -47,6 +47,16 @@ impl<const P: u64> Polynomial<P> {
         values: &Vec<FieldElement<P>>,
     ) -> Result<FieldElement<P>, PolynomialError> {
         // We must check against the right number of values
+        //
+        debug!(
+            "Evaluation of polynomial {} with terms of term {} with values {}",
+            self,
+            self.terms
+                .iter()
+                .map(|m| m.get_number_of_terms())
+                .join(" , "),
+            values.iter().join(" ")
+        );
         if self
             .terms
             .iter()
@@ -74,11 +84,6 @@ impl<const P: u64> Polynomial<P> {
 
         let number_of_combinations = 2_u64.pow(no_of_terms_not_fixed as u32);
 
-        debug!(
-            "Number of combinations: {} and no_of_terms_not_fixed {}",
-            number_of_combinations, no_of_terms_not_fixed,
-        );
-
         for i in 0..number_of_combinations {
             let mut values: Vec<FieldElement<P>> = fixed_terms.clone();
 
@@ -94,7 +99,15 @@ impl<const P: u64> Polynomial<P> {
             }
         }
 
-        Polynomial::new(monomials_evaluated)
+        let poly = Polynomial::new(monomials_evaluated).unwrap();
+
+        debug!(
+            "Polynomial reduced {} with terms {}",
+            poly,
+            poly.get_number_of_terms()
+        );
+
+        Ok(poly)
     }
 
     pub fn compute_sum(&self) -> FieldElement<P> {
@@ -111,6 +124,10 @@ impl<const P: u64> Polynomial<P> {
         }
 
         result
+    }
+
+    pub fn get_number_of_terms(&self) -> usize {
+        self.terms.first().unwrap().get_number_of_terms()
     }
 }
 

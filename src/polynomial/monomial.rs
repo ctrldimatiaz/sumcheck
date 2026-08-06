@@ -63,7 +63,11 @@ impl<const P: u64> Monomial<P> {
             } else {
                 //we will have minus 1 variable in values
 
-                let values_index = if index > 0 { index - 1 } else { index };
+                let values_index = if index > 0 && fixed_value < (self.exponents.len() - 1) as u64 {
+                    index - 1
+                } else {
+                    index
+                };
 
                 coefficient = coefficient * values[values_index].pow(*exponent as u64);
             }
@@ -72,6 +76,11 @@ impl<const P: u64> Monomial<P> {
         let mut exponents = vec![0; fixed_value as usize];
 
         exponents.push(result_exponent);
+
+        debug!(
+            "Created monomial with exponents: {}",
+            exponents.iter().join(" , ")
+        );
 
         Monomial {
             coefficient,
