@@ -1,6 +1,6 @@
 # Sum Check Protocol
 
-Work in progress... Right now, you will only see logs on the console. The prover and verifier implementation are still missing, as well as testing examples.
+Work in progress... Right now, there is only one Toyexample implementing the sumcheck protocol while it is still missing the final round. 
 
 ## Vision
 

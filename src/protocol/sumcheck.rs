@@ -28,6 +28,7 @@ impl<const P: u64> SumCheck<P> {
         let mut previous_gn: Option<Polynomial<P>> = None;
 
         for i in 0..self.no_of_rounds {
+            //prover returns gn univariate polynomial
             match self.prover.compute_round(&round) {
                 Ok(gn) => {
                     info!(
@@ -44,6 +45,7 @@ impl<const P: u64> SumCheck<P> {
 
                     round_gn.push(gn);
 
+                    //if round is ok verifier return the rn
                     match self.verifier.check_round(
                         &round_gn[i as usize],
                         round_rn,
@@ -68,6 +70,9 @@ impl<const P: u64> SumCheck<P> {
                 }
             }
         }
+
+        //final round
+        //there should be the oracle call and match with gn(rn) = g(r1,r2...rn)
 
         true
     }
