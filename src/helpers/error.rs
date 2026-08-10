@@ -13,7 +13,7 @@ impl fmt::Display for PolynomialError {
         match self {
             Self::NotMultilinear => write!(f, "Polynomial is not multilinear"),
             Self::DifferentVariableCounts => {
-                write!(f, "Variable exponent or variable value is missing")
+                write!(f, "Values provided differ from variables number.")
             }
             Self::EmptyPolynomial => write!(f, "Polynomial is empty"),
             Self::ConstantPolynomial => write!(f, "Polynomial is constant. No use for it."),

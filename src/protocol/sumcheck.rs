@@ -35,10 +35,10 @@ impl<const P: u64> SumCheck<P> {
                         "Prover computed round {} with gn {} with number of terms {}",
                         i,
                         gn,
-                        gn.get_number_of_terms()
+                        gn.get_number_of_variables()
                     );
 
-                    if round.len() > 0 {
+                    if !round.is_empty() {
                         round_rn = Some(*round.last().unwrap());
                         previous_gn = Some(round_gn[(i - 1) as usize].clone());
                     }

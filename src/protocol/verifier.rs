@@ -25,11 +25,13 @@ impl<const P: u64> Verifier<P> {
         debug!(
             "Polynomial at verifier {} with terms {}",
             polynomial,
-            polynomial.get_number_of_terms()
+            polynomial.get_number_of_variables()
         );
 
-        let mut values_zero = vec![FieldElement::<P>::zero(); polynomial.get_number_of_terms() - 1];
-        let mut values_one = vec![FieldElement::<P>::zero(); polynomial.get_number_of_terms() - 1];
+        let mut values_zero =
+            vec![FieldElement::<P>::zero(); polynomial.get_number_of_variables() - 1];
+        let mut values_one =
+            vec![FieldElement::<P>::zero(); polynomial.get_number_of_variables() - 1];
 
         values_zero.push(FieldElement::zero());
         values_one.push(FieldElement::one());
@@ -49,7 +51,7 @@ impl<const P: u64> Verifier<P> {
 
         let previous_gn = polynomial_previous_gn.unwrap();
 
-        values_zero = vec![FieldElement::<P>::zero(); previous_gn.get_number_of_terms() - 1];
+        values_zero = vec![FieldElement::<P>::zero(); previous_gn.get_number_of_variables() - 1];
         values_zero.push(rn);
 
         let grn = previous_gn.evaluate(&values_zero).unwrap();
@@ -68,7 +70,8 @@ impl<const P: u64> Verifier<P> {
     ) -> Result<FieldElement<P>, ProtocolError> {
         let result = FieldElement::one();
 
-        let mut values_zero = vec![FieldElement::<P>::zero(); last_gn.get_number_of_terms() - 1];
+        let mut values_zero =
+            vec![FieldElement::<P>::zero(); last_gn.get_number_of_variables() - 1];
         let last_rn = values.last().unwrap();
 
         values_zero.push(*last_rn);

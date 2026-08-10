@@ -1,7 +1,7 @@
 use std::fmt::Display;
 
 use itertools::Itertools;
-use log::debug;
+use log::{debug, error};
 
 use crate::{
     field::field_element::FieldElement,
@@ -23,25 +23,34 @@ impl<const P: u64> Polynomial<P> {
         // the terms must all be explicitly defined during initialization
         // Ex.: 5x1x2 + 7x1x3x5
         // 5[1,1,0,0,0] and 7[1,0,1,0,1]
-        if !values.iter().map(|m| m.get_number_of_terms()).all_equal() {
+        if !values
+            .iter()
+            .map(|m| m.get_number_of_variables())
+            .all_equal()
+        {
             return Err(PolynomialError::DifferentVariableCounts);
         }
 
         Ok(Self { terms: values })
     }
 
+    // Check if polynomial is multilinear by checking that all terms are multilinear
     pub fn is_multilinear(&self) -> bool {
         self.terms.iter().all(|term| term.is_multilinear())
     }
 
+    // All monomials must be constant. After we add collect terms in monomial this function will
+    // work properlly without any chance of different terms nulling each other.
     pub fn is_constant(&self) -> bool {
         self.terms.iter().all(|term| term.is_constant())
     }
 
+    // Reusable function to print the readable polynomial
     pub fn get_readable_polynomial(&self) -> String {
         self.terms.iter().join(" + ")
     }
 
+    // Evaluate the polynomial with the provided values.
     pub fn evaluate(
         &self,
         values: &Vec<FieldElement<P>>,
@@ -53,27 +62,40 @@ impl<const P: u64> Polynomial<P> {
             self,
             self.terms
                 .iter()
-                .map(|m| m.get_number_of_terms())
+                .map(|m| m.get_number_of_variables())
                 .join(" , "),
             values.iter().join(" ")
         );
         if self
             .terms
             .iter()
-            .any(|t| t.get_number_of_terms() != values.len())
+            .any(|t| t.get_number_of_variables() != values.len())
         {
             return Err(PolynomialError::DifferentVariableCounts);
         }
 
         let mut result: FieldElement<P> = FieldElement::zero();
 
+        // go through all the monomials and perform the individual evaluation
         for term in &self.terms {
-            result = result + term.evaluate(values);
+            let term_evaluation_result = term.evaluate(values);
+
+            if term_evaluation_result.is_err() {
+                error!(
+                    "Failed to evaluate monomial values: {}",
+                    term_evaluation_result.unwrap_err()
+                );
+                return term_evaluation_result;
+            }
+
+            result = result + term_evaluation_result.unwrap();
         }
 
         Ok(result)
     }
 
+    // Reduce the polynomial to the variable derived from fixed_terms
+    // [] -> reduce to x1. [1] -> x2 ...
     pub fn reduce_polynomial(
         &self,
         fixed_terms: &Vec<FieldElement<P>>,
@@ -104,16 +126,19 @@ impl<const P: u64> Polynomial<P> {
         debug!(
             "Polynomial reduced {} with terms {}",
             poly,
-            poly.get_number_of_terms()
+            poly.get_number_of_variables()
         );
 
         Ok(poly)
     }
 
+    // Compute the sum through the hyperbolic hypercube
     pub fn compute_sum(&self) -> FieldElement<P> {
         let mut result = FieldElement::zero();
         let number_of_combinations = 2_u64.pow(self.terms.len() as u32);
 
+        // evaluate through all the combinations according to the number of variables
+        // ex.: 3 variables would go through 0 - (0,0,0), 1 - (0,0,1)... and would have 2³ = 8 combinations
         for i in 0..number_of_combinations {
             let values = number_to_bits_vec(i, self.terms.len())
                 .iter()
@@ -126,8 +151,10 @@ impl<const P: u64> Polynomial<P> {
         result
     }
 
-    pub fn get_number_of_terms(&self) -> usize {
-        self.terms.first().unwrap().get_number_of_terms()
+    // Get the numebr of variables of the polynomial. We are sure all the variables are referenced
+    // doing initialization and expect the error DifferentVariableCount otherwise
+    pub fn get_number_of_variables(&self) -> usize {
+        self.terms.first().unwrap().get_number_of_variables()
     }
 }
 

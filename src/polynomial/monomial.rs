@@ -3,7 +3,7 @@ use std::fmt::Display;
 use itertools::Itertools;
 use log::debug;
 
-use crate::FieldElement;
+use crate::{FieldElement, helpers::error::PolynomialError};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Monomial<const P: u64> {
@@ -19,32 +19,42 @@ impl<const P: u64> Monomial<P> {
         }
     }
 
+    //Check if monomial is is multilinear
     pub fn is_multilinear(&self) -> bool {
         self.exponents.iter().all(|&e| e <= 1) || self.coefficient == FieldElement::zero()
     }
 
+    // Check if monomial is constant.
     pub fn is_constant(&self) -> bool {
         self.exponents.iter().all(|&e| e == 0) || self.coefficient == FieldElement::zero()
     }
 
-    pub fn get_number_of_terms(&self) -> usize {
+    // Number of variables in polynomial
+    pub fn get_number_of_variables(&self) -> usize {
         self.exponents.len()
     }
 
-    pub fn evaluate(&self, values: &Vec<FieldElement<P>>) -> FieldElement<P> {
+    // Evaluate the monomial according to the variables values passed
+    pub fn evaluate(&self, values: &[FieldElement<P>]) -> Result<FieldElement<P>, PolynomialError> {
+        if values.len() != self.exponents.len() {
+            return Err(PolynomialError::DifferentVariableCounts);
+        }
+
         let mut result: FieldElement<P> = self.coefficient;
 
         for (index, exponent) in self.exponents.iter().enumerate() {
             result = result * values[index].pow(*exponent as u64);
         }
 
-        result
+        Ok(result)
     }
 
+    // Reduce the monomial to the fixed_value variable index with fixed values in argument values.
+    // Ex. 0 -> returns x1 monomial, fixed_value = 1 and values = 17 reduce to x2 with x1=17
     pub fn evaluate_with_fixing_term(
         &self,
         fixed_value: u64,
-        values: &Vec<FieldElement<P>>,
+        values: &[FieldElement<P>],
     ) -> Monomial<P> {
         debug!(
             "Received values at monomial evaluation: {} and index {}",
@@ -124,7 +134,7 @@ mod tests {
     fn test_zero_evaluation() {
         let monomial = M17::new(FieldElement::zero(), vec![1, 2]);
         assert_eq!(
-            monomial.evaluate(&vec![F17::zero(), F17::zero()]),
+            monomial.evaluate(&vec![F17::zero(), F17::zero()]).unwrap(),
             FieldElement::zero()
         );
     }
@@ -171,6 +181,6 @@ mod tests {
         let coeff = FieldElement::from_u64(5u64);
         let monomial = M17::new(coeff, vec![1, 1]);
 
-        assert_eq!(monomial.get_number_of_terms(), 2);
+        assert_eq!(monomial.get_number_of_variables(), 2);
     }
 }

@@ -1,7 +1,5 @@
 use std::fmt::Display;
 
-use itertools::Itertools;
-
 use crate::{
     field::field_element::FieldElement, helpers::error::PolynomialError,
     polynomial::polynomial::Polynomial,
