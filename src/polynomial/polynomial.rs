@@ -1,7 +1,7 @@
-use std::fmt::Display;
+use std::{collections::HashMap, fmt::Display};
 
 use itertools::Itertools;
-use log::{debug, error};
+use log::debug;
 
 use crate::{
     field::field_element::FieldElement,
@@ -15,15 +15,19 @@ pub struct Polynomial<const P: u64> {
 }
 
 impl<const P: u64> Polynomial<P> {
-    pub fn new(values: Vec<Monomial<P>>) -> Result<Self, PolynomialError> {
-        if values.is_empty() {
+    pub fn new(terms: Vec<Monomial<P>>) -> Result<Self, PolynomialError> {
+        if terms.is_empty() {
             return Err(PolynomialError::EmptyPolynomial);
         }
+
+        // I assume it is better to simplify before checking the number of variables in case of
+        // even when having wrong terms it may null out the wrong ones
+        let collected_terms = Polynomial::collect_terms(&terms);
 
         // the terms must all be explicitly defined during initialization
         // Ex.: 5x1x2 + 7x1x3x5
         // 5[1,1,0,0,0] and 7[1,0,1,0,1]
-        if !values
+        if !collected_terms
             .iter()
             .map(|m| m.get_number_of_variables())
             .all_equal()
@@ -31,7 +35,9 @@ impl<const P: u64> Polynomial<P> {
             return Err(PolynomialError::DifferentVariableCounts);
         }
 
-        Ok(Self { terms: values })
+        Ok(Self {
+            terms: collected_terms,
+        })
     }
 
     // Check if polynomial is multilinear by checking that all terms are multilinear
@@ -51,10 +57,7 @@ impl<const P: u64> Polynomial<P> {
     }
 
     // Evaluate the polynomial with the provided values.
-    pub fn evaluate(
-        &self,
-        values: &Vec<FieldElement<P>>,
-    ) -> Result<FieldElement<P>, PolynomialError> {
+    pub fn evaluate(&self, values: &[FieldElement<P>]) -> Result<FieldElement<P>, PolynomialError> {
         // We must check against the right number of values
         //
         debug!(
@@ -78,17 +81,9 @@ impl<const P: u64> Polynomial<P> {
 
         // go through all the monomials and perform the individual evaluation
         for term in &self.terms {
-            let term_evaluation_result = term.evaluate(values);
+            let term_evaluation_result = term.evaluate(values)?;
 
-            if term_evaluation_result.is_err() {
-                error!(
-                    "Failed to evaluate monomial values: {}",
-                    term_evaluation_result.unwrap_err()
-                );
-                return term_evaluation_result;
-            }
-
-            result = result + term_evaluation_result.unwrap();
+            result = result + term_evaluation_result;
         }
 
         Ok(result)
@@ -98,7 +93,7 @@ impl<const P: u64> Polynomial<P> {
     // [] -> reduce to x1. [1] -> x2 ...
     pub fn reduce_polynomial(
         &self,
-        fixed_terms: &Vec<FieldElement<P>>,
+        fixed_terms: &[FieldElement<P>],
     ) -> Result<Polynomial<P>, PolynomialError> {
         let mut monomials_evaluated: Vec<Monomial<P>> = vec![];
 
@@ -107,7 +102,7 @@ impl<const P: u64> Polynomial<P> {
         let number_of_combinations = 2_u64.pow(no_of_terms_not_fixed as u32);
 
         for i in 0..number_of_combinations {
-            let mut values: Vec<FieldElement<P>> = fixed_terms.clone();
+            let mut values: Vec<FieldElement<P>> = fixed_terms.to_vec();
 
             values.extend(
                 number_to_bits_vec(i, no_of_terms_not_fixed)
@@ -140,7 +135,7 @@ impl<const P: u64> Polynomial<P> {
         // evaluate through all the combinations according to the number of variables
         // ex.: 3 variables would go through 0 - (0,0,0), 1 - (0,0,1)... and would have 2³ = 8 combinations
         for i in 0..number_of_combinations {
-            let values = number_to_bits_vec(i, self.terms.len())
+            let values: Vec<FieldElement<P>> = number_to_bits_vec(i, self.terms.len())
                 .iter()
                 .map(|bit| FieldElement::from_u64(*bit))
                 .collect();
@@ -155,6 +150,29 @@ impl<const P: u64> Polynomial<P> {
     // doing initialization and expect the error DifferentVariableCount otherwise
     pub fn get_number_of_variables(&self) -> usize {
         self.terms.first().unwrap().get_number_of_variables()
+    }
+
+    // Simplify the polynomial collecting the terms with the same exponents.
+    // (=> there are variables repeated that could be simplified)
+    fn collect_terms(terms: &[Monomial<P>]) -> Vec<Monomial<P>> {
+        let mut map: HashMap<Vec<usize>, FieldElement<P>> = HashMap::new();
+
+        //collect same exponent to a hashmap and sum coefficients
+        for term in terms {
+            let key = term.exponents().to_vec();
+            let entry = map.entry(key).or_insert_with(|| FieldElement::zero());
+
+            *entry = std::mem::take(entry) + term.coefficient();
+        }
+
+        map.into_iter()
+            .filter_map(|(exponents, coeff)| {
+                if coeff == FieldElement::zero() {
+                    return None;
+                }
+                Some(Monomial::new(coeff, exponents).unwrap())
+            })
+            .collect()
     }
 }
 
@@ -175,8 +193,8 @@ mod tests {
     fn test_empty_polynomial() {
         let polynomial = P17::new(vec![]).unwrap_err();
         let multilinear_polynomial = P17::new(vec![
-            Monomial::new(FieldElement::from_u64(5), vec![0, 0]),
-            Monomial::new(FieldElement::from_u64(5), vec![1, 1]),
+            Monomial::new(FieldElement::from_u64(5), vec![0, 0]).unwrap(),
+            Monomial::new(FieldElement::from_u64(5), vec![1, 1]).unwrap(),
         ]);
 
         assert!(multilinear_polynomial.is_ok());
@@ -186,14 +204,14 @@ mod tests {
     #[test]
     fn test_polynomial_constantness() {
         let zerocoeff_constant_polynomial = P17::new(vec![
-            Monomial::new(FieldElement::from_u64(5), vec![0, 0]),
-            Monomial::new(FieldElement::from_u64(0), vec![1, 1]),
+            Monomial::new(FieldElement::from_u64(5), vec![0, 0]).unwrap(),
+            Monomial::new(FieldElement::from_u64(0), vec![1, 1]).unwrap(),
         ])
         .unwrap();
 
         let constant_polynomial = P17::new(vec![
-            Monomial::new(FieldElement::from_u64(5), vec![0, 0]),
-            Monomial::new(FieldElement::from_u64(10), vec![0, 0]),
+            Monomial::new(FieldElement::from_u64(5), vec![0, 0]).unwrap(),
+            Monomial::new(FieldElement::from_u64(10), vec![0, 0]).unwrap(),
         ])
         .unwrap();
 
@@ -204,14 +222,14 @@ mod tests {
     #[test]
     fn test_polynomial_multilinearity() {
         let multilinear_polynomial = P17::new(vec![
-            Monomial::new(FieldElement::from_u64(5), vec![0, 0]),
-            Monomial::new(FieldElement::from_u64(5), vec![1, 1]),
+            Monomial::new(FieldElement::from_u64(5), vec![0, 0]).unwrap(),
+            Monomial::new(FieldElement::from_u64(5), vec![1, 1]).unwrap(),
         ])
         .unwrap();
 
         let not_multilinear_polynomial = P17::new(vec![
-            Monomial::new(FieldElement::from_u64(5), vec![0, 4]),
-            Monomial::new(FieldElement::from_u64(10), vec![0, 0]),
+            Monomial::new(FieldElement::from_u64(5), vec![0, 4]).unwrap(),
+            Monomial::new(FieldElement::from_u64(10), vec![0, 0]).unwrap(),
         ])
         .unwrap();
 
@@ -223,15 +241,15 @@ mod tests {
     fn test_polynomial_evaluation() {
         //0
         let zero_multilinear_polynomial = P17::new(vec![
-            Monomial::new(FieldElement::from_u64(0), vec![0, 0]),
-            Monomial::new(FieldElement::from_u64(0), vec![1, 1]),
+            Monomial::new(FieldElement::from_u64(0), vec![0, 0]).unwrap(),
+            Monomial::new(FieldElement::from_u64(0), vec![1, 1]).unwrap(),
         ])
         .unwrap();
 
         //5x2⁴ + 10
         let multilinear_polynomial = P17::new(vec![
-            Monomial::new(FieldElement::from_u64(5), vec![0, 4]),
-            Monomial::new(FieldElement::from_u64(10), vec![0, 0]),
+            Monomial::new(FieldElement::from_u64(5), vec![0, 4]).unwrap(),
+            Monomial::new(FieldElement::from_u64(10), vec![0, 0]).unwrap(),
         ])
         .unwrap();
 

@@ -12,11 +12,26 @@ pub struct Monomial<const P: u64> {
 }
 
 impl<const P: u64> Monomial<P> {
-    pub fn new(coefficient: FieldElement<P>, exponents: Vec<usize>) -> Self {
-        Monomial {
+    pub fn new(
+        coefficient: FieldElement<P>,
+        exponents: Vec<usize>,
+    ) -> Result<Self, PolynomialError> {
+        if exponents.is_empty() || coefficient == FieldElement::zero() {
+            return Err(PolynomialError::EmptyPolynomial);
+        }
+
+        Ok(Monomial {
             coefficient,
             exponents,
-        }
+        })
+    }
+
+    pub fn exponents(&self) -> &[usize] {
+        &self.exponents
+    }
+
+    pub fn coefficient(&self) -> FieldElement<P> {
+        self.coefficient
     }
 
     //Check if monomial is is multilinear

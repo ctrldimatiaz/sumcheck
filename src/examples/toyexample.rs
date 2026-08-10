@@ -14,9 +14,9 @@ impl<const P: u64> ToyExample<P> {
     pub fn run(&self) -> bool {
         //x2x3 + 2x1 + 5x1x2
         let polynomial: Polynomial<P> = Polynomial::new(vec![
-            Monomial::new(FieldElement::from_u64(1), vec![0, 1, 1]),
-            Monomial::new(FieldElement::from_u64(2), vec![1, 0, 0]),
-            Monomial::new(FieldElement::from_u64(5), vec![1, 1, 0]),
+            Monomial::new(FieldElement::from_u64(1), vec![0, 1, 1]).unwrap(),
+            Monomial::new(FieldElement::from_u64(2), vec![1, 0, 0]).unwrap(),
+            Monomial::new(FieldElement::from_u64(5), vec![1, 1, 0]).unwrap(),
         ])
         .unwrap();
 
