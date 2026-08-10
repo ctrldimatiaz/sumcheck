@@ -1,4 +1,3 @@
-use itertools::Itertools;
 use log::debug;
 use rand::RngExt;
 
@@ -21,7 +20,7 @@ impl<const P: u64> Verifier<P> {
         &self,
         polynomial: &Polynomial<P>,
         round_rn: Option<FieldElement<P>>,
-        polynomial_previousgn: Option<Polynomial<P>>,
+        polynomial_previous_gn: Option<Polynomial<P>>,
     ) -> Result<FieldElement<P>, ProtocolError> {
         debug!(
             "Polynomial at verifier {} with terms {}",
@@ -38,28 +37,43 @@ impl<const P: u64> Verifier<P> {
         let evaluated_polynomial =
             polynomial.evaluate(&values_zero).unwrap() + polynomial.evaluate(&values_one).unwrap();
 
-        match round_rn {
-            Some(rn) => {
-                let previous_gn = polynomial_previousgn.unwrap();
-
-                values_zero =
-                    vec![FieldElement::<P>::zero(); previous_gn.get_number_of_terms() - 1];
-                values_zero.push(rn);
-
-                let grn = previous_gn.evaluate(&values_zero).unwrap();
-
-                if grn == evaluated_polynomial {
-                    return Ok(self.generate_rn());
-                }
+        if round_rn.is_none() {
+            if self.claimed_sum == evaluated_polynomial {
+                return Ok(self.generate_rn());
             }
-            None => {
-                if self.claimed_sum == evaluated_polynomial {
-                    return Ok(self.generate_rn());
-                }
-            }
+
+            return Err(ProtocolError::InvalidClaim);
+        }
+
+        let rn = round_rn.unwrap();
+
+        let previous_gn = polynomial_previous_gn.unwrap();
+
+        values_zero = vec![FieldElement::<P>::zero(); previous_gn.get_number_of_terms() - 1];
+        values_zero.push(rn);
+
+        let grn = previous_gn.evaluate(&values_zero).unwrap();
+
+        if grn == evaluated_polynomial {
+            return Ok(self.generate_rn());
         }
 
         Err(ProtocolError::InvalidClaim)
+    }
+
+    pub fn final_round(
+        &self,
+        last_gn: &Polynomial<P>,
+        values: Vec<FieldElement<P>>,
+    ) -> Result<FieldElement<P>, ProtocolError> {
+        let result = FieldElement::one();
+
+        let mut values_zero = vec![FieldElement::<P>::zero(); last_gn.get_number_of_terms() - 1];
+        let last_rn = values.last().unwrap();
+
+        values_zero.push(*last_rn);
+
+        Ok(result)
     }
 
     fn generate_rn(&self) -> FieldElement<P> {

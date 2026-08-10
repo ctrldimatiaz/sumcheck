@@ -74,6 +74,17 @@ impl<const P: u64> SumCheck<P> {
         //final round
         //there should be the oracle call and match with gn(rn) = g(r1,r2...rn)
 
+        let v = round_gn.last().unwrap();
+        match self.verifier.final_round(v, round) {
+            Ok(_rn) => {
+                info!("Verifier computed final round successfully.");
+            }
+            Err(e) => {
+                error!("Error in verifier at last round: {}", e);
+                return false;
+            }
+        }
+
         true
     }
 }
