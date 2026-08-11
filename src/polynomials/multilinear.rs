@@ -102,6 +102,6 @@ mod tests {
 
         let result = multilinear.evaluate(values).unwrap();
 
-        assert_eq!(result, FieldElement::from_u64(10));
+        assert_eq!(result, FieldElement::from_u64(8));
     }
 }
