@@ -5,7 +5,7 @@ use log::{error, info};
 mod examples;
 mod field;
 mod helpers;
-mod polynomial;
+mod polynomials;
 mod protocol;
 
 fn main() {

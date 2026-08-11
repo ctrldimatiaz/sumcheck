@@ -2,7 +2,7 @@ use log::{error, info};
 
 use crate::{
     field::field_element::FieldElement,
-    polynomial::polynomial::Polynomial,
+    polynomials::polynomial::Polynomial,
     protocol::{prover::Prover, verifier::Verifier},
 };
 
@@ -75,6 +75,7 @@ impl<const P: u64> SumCheck<P> {
         //there should be the oracle call and match with gn(rn) = g(r1,r2...rn)
 
         let v = round_gn.last().unwrap();
+
         match self.verifier.final_round(v, round) {
             Ok(_rn) => {
                 info!("Verifier computed final round successfully.");

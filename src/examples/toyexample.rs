@@ -1,6 +1,6 @@
 use crate::{
     field::field_element::FieldElement,
-    polynomial::{monomial::Monomial, multilinear::MultilinearPolynomial, polynomial::Polynomial},
+    polynomials::{monomial::Monomial, multilinear::MultilinearPolynomial, polynomial::Polynomial},
     protocol::{prover::Prover, sumcheck::SumCheck, verifier::Verifier},
 };
 

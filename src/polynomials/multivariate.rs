@@ -4,6 +4,7 @@ pub struct MultivariatePolynomial<const P: u64> {
     variable_coefficients: Vec<Vec<FieldElement<P>>>,
 }
 
+#[allow(dead_code)]
 impl<const P: u64> MultivariatePolynomial<P> {
     pub fn from_variables_vec(vector: Vec<Vec<FieldElement<P>>>) -> Self {
         Self {
@@ -11,7 +12,7 @@ impl<const P: u64> MultivariatePolynomial<P> {
         }
     }
 
-    pub fn evaluate(self, elements: &Vec<FieldElement<P>>) -> FieldElement<P> {
+    pub fn evaluate(self, elements: &[FieldElement<P>]) -> FieldElement<P> {
         let mut result: FieldElement<P> = FieldElement::zero();
 
         if elements.len() != self.variable_coefficients.len() {

@@ -5,6 +5,7 @@ pub struct UnivariatePolynomial<const P: u64> {
     coefficients: Vec<FieldElement<P>>,
 }
 
+#[allow(dead_code)]
 impl<const P: u64> UnivariatePolynomial<P> {
     pub fn from_field_vec(vector: Vec<FieldElement<P>>) -> Self {
         Self {

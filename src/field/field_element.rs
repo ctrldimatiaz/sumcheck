@@ -22,6 +22,8 @@ impl<const P: u64> FieldElement<P> {
     pub fn from_u64(value: u64) -> Self {
         Self { value: value % P }
     }
+
+    #[allow(dead_code)]
     pub fn from_i64(value: i64) -> Self {
         Self {
             value: value.rem_euclid(P as i64) as u64,
@@ -76,6 +78,7 @@ impl<const P: u64> Sub for FieldElement<P> {
 }
 
 // For learning purposes we use u64 and u128 to avoid multiplication overflow
+#[allow(clippy::suspicious_arithmetic_impl)]
 impl<const P: u64> Mul for FieldElement<P> {
     type Output = Self;
     fn mul(self, element: Self) -> Self::Output {
@@ -144,7 +147,7 @@ fn mod_inverse(e: u64, p: u64) -> Option<u64> {
     }
 
     if t < 0 {
-        t = t + (p as i64);
+        t += p as i64;
     }
     Some(t as u64)
 }

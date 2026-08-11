@@ -6,7 +6,7 @@ use log::debug;
 use crate::{
     field::field_element::FieldElement,
     helpers::{error::PolynomialError, functions::number_to_bits_vec},
-    polynomial::monomial::Monomial,
+    polynomials::monomial::Monomial,
 };
 
 #[derive(Debug, Clone, PartialEq)]
@@ -160,7 +160,7 @@ impl<const P: u64> Polynomial<P> {
         //collect same exponent to a hashmap and sum coefficients
         for term in terms {
             let key = term.exponents().to_vec();
-            let entry = map.entry(key).or_insert_with(|| FieldElement::zero());
+            let entry = map.entry(key).or_default();
 
             *entry = std::mem::take(entry) + term.coefficient();
         }
@@ -170,7 +170,14 @@ impl<const P: u64> Polynomial<P> {
                 if coeff == FieldElement::zero() {
                     return None;
                 }
-                Some(Monomial::new(coeff, exponents).unwrap())
+
+                match Monomial::new(coeff, exponents) {
+                    Ok(monomial) => Some(monomial),
+                    Err(e) => {
+                        debug!("Error creating monomial while collecting terms: {}", e);
+                        None
+                    }
+                }
             })
             .collect()
     }
@@ -203,9 +210,9 @@ mod tests {
 
     #[test]
     fn test_polynomial_constantness() {
-        let zerocoeff_constant_polynomial = P17::new(vec![
+        let not_constant_polynomial = P17::new(vec![
             Monomial::new(FieldElement::from_u64(5), vec![0, 0]).unwrap(),
-            Monomial::new(FieldElement::from_u64(0), vec![1, 1]).unwrap(),
+            Monomial::new(FieldElement::from_u64(1), vec![1, 1]).unwrap(),
         ])
         .unwrap();
 
@@ -216,7 +223,7 @@ mod tests {
         .unwrap();
 
         assert!(constant_polynomial.is_constant());
-        assert!(zerocoeff_constant_polynomial.is_constant());
+        assert!(!not_constant_polynomial.is_constant());
     }
 
     #[test]
@@ -239,29 +246,35 @@ mod tests {
 
     #[test]
     fn test_polynomial_evaluation() {
-        //0
-        let zero_multilinear_polynomial = P17::new(vec![
-            Monomial::new(FieldElement::from_u64(0), vec![0, 0]).unwrap(),
-            Monomial::new(FieldElement::from_u64(0), vec![1, 1]).unwrap(),
+        // constant
+        let constant_polynomial = P17::new(vec![
+            Monomial::new(FieldElement::from_u64(1), vec![0, 0]).unwrap(),
+            Monomial::new(FieldElement::from_u64(18), vec![0, 0]).unwrap(),
         ])
         .unwrap();
 
-        //5x2⁴ + 10
+        //5x2 +10x1x2
         let multilinear_polynomial = P17::new(vec![
-            Monomial::new(FieldElement::from_u64(5), vec![0, 4]).unwrap(),
-            Monomial::new(FieldElement::from_u64(10), vec![0, 0]).unwrap(),
+            Monomial::new(FieldElement::from_u64(5), vec![0, 1]).unwrap(),
+            Monomial::new(FieldElement::from_u64(10), vec![1, 1]).unwrap(),
         ])
         .unwrap();
 
         let values = vec![FieldElement::from_u64(5u64), FieldElement::from_u64(2u64)];
 
         assert_eq!(
-            zero_multilinear_polynomial.evaluate(&values).unwrap(),
-            FieldElement::zero()
+            constant_polynomial.evaluate(&values).unwrap(),
+            FieldElement::from_i64(2_i64)
         );
         assert_eq!(
             multilinear_polynomial.evaluate(&values).unwrap(),
-            FieldElement::from_u64(5u64)
+            FieldElement::from_u64(8_u64)
         );
+        assert_eq!(
+            multilinear_polynomial
+                .evaluate(&(vec![FieldElement::zero(); 2]))
+                .unwrap(),
+            FieldElement::zero()
+        )
     }
 }

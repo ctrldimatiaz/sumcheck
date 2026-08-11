@@ -2,7 +2,7 @@ use std::fmt::Display;
 
 use crate::{
     field::field_element::FieldElement, helpers::error::PolynomialError,
-    polynomial::polynomial::Polynomial,
+    polynomials::polynomial::Polynomial,
 };
 
 #[derive(Debug, Clone, PartialEq)]
@@ -23,6 +23,7 @@ impl<const P: u64> MultilinearPolynomial<P> {
         Ok(Self { polynomial })
     }
 
+    #[allow(dead_code)]
     pub fn evaluate(
         &self,
         values: Vec<FieldElement<P>>,
@@ -30,9 +31,12 @@ impl<const P: u64> MultilinearPolynomial<P> {
         self.polynomial.evaluate(&values)
     }
 
+    // reduce polynomial to the specified variable by round
+    // Ex.: [] -> return polynomial with X1 fixed,
+    // [r1] would return polynomial with X2 fixed and x1 = r1
     pub fn reduce_polynomial(
         &self,
-        round: &Vec<FieldElement<P>>,
+        round: &[FieldElement<P>],
     ) -> Result<Polynomial<P>, PolynomialError> {
         self.polynomial.reduce_polynomial(round)
     }
@@ -51,7 +55,7 @@ impl<const P: u64> Display for MultilinearPolynomial<P> {
 
 #[cfg(test)]
 mod tests {
-    use crate::polynomial::monomial::Monomial;
+    use crate::polynomials::monomial::Monomial;
 
     use super::*;
 
@@ -61,8 +65,8 @@ mod tests {
     #[test]
     fn test_multilinear_polynomial_constantness() {
         let polynomial = P17::new(vec![
-            Monomial::new(FieldElement::from_u64(5), vec![0, 0]),
-            Monomial::new(FieldElement::from_u64(5), vec![0, 0]),
+            Monomial::new(FieldElement::from_u64(5), vec![0, 0]).unwrap(),
+            Monomial::new(FieldElement::from_u64(5), vec![0, 0]).unwrap(),
         ])
         .unwrap();
 
@@ -74,8 +78,8 @@ mod tests {
     #[test]
     fn test_multilinear_polynomial_multilinearity() {
         let poly = P17::new(vec![
-            Monomial::new(FieldElement::from_u64(5), vec![0, 0]),
-            Monomial::new(FieldElement::from_u64(5), vec![2, 2]),
+            Monomial::new(FieldElement::from_u64(5), vec![0, 0]).unwrap(),
+            Monomial::new(FieldElement::from_u64(5), vec![2, 2]).unwrap(),
         ])
         .unwrap();
 
@@ -87,8 +91,8 @@ mod tests {
     #[test]
     fn test_multilinear_polynomial_evaluation() {
         let poly = P17::new(vec![
-            Monomial::new(FieldElement::from_u64(5), vec![0, 1]),
-            Monomial::new(FieldElement::from_u64(5), vec![1, 1]),
+            Monomial::new(FieldElement::from_u64(5), vec![0, 1]).unwrap(),
+            Monomial::new(FieldElement::from_u64(5), vec![1, 1]).unwrap(),
         ])
         .unwrap();
 

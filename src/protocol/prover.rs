@@ -1,7 +1,7 @@
 use crate::{
     field::field_element::FieldElement,
     helpers::error::PolynomialError,
-    polynomial::{multilinear::MultilinearPolynomial, polynomial::Polynomial},
+    polynomials::{multilinear::MultilinearPolynomial, polynomial::Polynomial},
 };
 
 pub struct Prover<const P: u64> {
@@ -17,9 +17,10 @@ impl<const P: u64> Prover<P> {
         self.polynomial.compute_sum()
     }
 
+    //compute gn polynomial per each round
     pub fn compute_round(
         &self,
-        round: &Vec<FieldElement<P>>,
+        round: &[FieldElement<P>],
     ) -> Result<Polynomial<P>, PolynomialError> {
         self.polynomial.reduce_polynomial(round)
     }
