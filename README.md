@@ -27,3 +27,5 @@ cargo run
 This project was created as a learning exercise based on concepts from:
 - *Proofs, Arguments and Zero-Knowledge* by Justin Thaler (https://people.cs.georgetown.edu/jthaler/ProofsArgsAndZK.pdf)
   - Specifically, the Sum-Check Protocol described in Chapter 4 starting with simpler examples.
+
+-Try CI Trigger
