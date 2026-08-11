@@ -78,7 +78,6 @@ impl<const P: u64> Sub for FieldElement<P> {
 }
 
 // For learning purposes we use u64 and u128 to avoid multiplication overflow
-#[allow(clippy::suspicious_arithmetic_impl)]
 impl<const P: u64> Mul for FieldElement<P> {
     type Output = Self;
     fn mul(self, element: Self) -> Self::Output {
@@ -88,6 +87,7 @@ impl<const P: u64> Mul for FieldElement<P> {
 }
 
 /// We actually multiply by the inverse
+#[allow(clippy::suspicious_arithmetic_impl)]
 impl<const P: u64> Div for FieldElement<P> {
     type Output = Self;
     fn div(self, element: Self) -> Self::Output {
