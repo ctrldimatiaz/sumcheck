@@ -10,9 +10,12 @@ mod polynomials;
 mod protocol;
 
 fn main() {
+<<<<<<< HEAD
     // load .env
     dotenv().ok();
 
+=======
+>>>>>>> backup-rebase-state
     let env = Env::default().filter_or("RUST_LOG", "info");
 
     env_logger::init_from_env(env);
