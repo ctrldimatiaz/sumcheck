@@ -23,6 +23,15 @@ or only:
 cargo run
 ```
 
+## Environment varibales
+
+RUST_LOG defaults to info:
+error (Level 1)
+warn (Level 2)
+info (Level 3)
+debug (Level 4)
+trace (Level 5)
+
 ## Acknowledgments
 This project was created as a learning exercise based on concepts from:
 - *Proofs, Arguments and Zero-Knowledge* by Justin Thaler (https://people.cs.georgetown.edu/jthaler/ProofsArgsAndZK.pdf)
