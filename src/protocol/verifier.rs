@@ -2,7 +2,7 @@ use log::debug;
 use rand::RngExt;
 
 use crate::{
-    field::field_element::FieldElement, helpers::error::ProtocolError,
+    field::field_element::FieldElement, helpers::error::ProtocolResponse,
     polynomials::polynomial::Polynomial,
 };
 
@@ -23,7 +23,7 @@ impl<const P: u64> Verifier<P> {
         polynomial: &Polynomial<P>,
         round_rn: Option<FieldElement<P>>,
         polynomial_previous_gn: Option<Polynomial<P>>,
-    ) -> Result<FieldElement<P>, ProtocolError> {
+    ) -> Result<FieldElement<P>, ProtocolResponse> {
         debug!(
             "Polynomial at verifier {} with terms {}",
             polynomial,
@@ -43,13 +43,13 @@ impl<const P: u64> Verifier<P> {
                 "There was an issue at the verifier obtaining the previous polynomial gn. {}",
                 e
             );
-            ProtocolError::InvalidClaim
+            ProtocolResponse::InvalidClaim
         })? + polynomial.evaluate(&values_one).map_err(|e| {
             debug!(
                 "There was an issue at the verifier obtaining the previous polynomial gn. {}",
                 e
             );
-            ProtocolError::InvalidClaim
+            ProtocolResponse::InvalidClaim
         })?;
 
         // first round
@@ -58,7 +58,7 @@ impl<const P: u64> Verifier<P> {
                 return Ok(self.generate_rn());
             }
 
-            return Err(ProtocolError::InvalidClaim);
+            return Err(ProtocolResponse::InvalidClaim);
         }
 
         // rounds 1...n
@@ -66,7 +66,7 @@ impl<const P: u64> Verifier<P> {
 
         let previous_gn = polynomial_previous_gn.ok_or_else(|| {
             debug!("There was an issue at the verifier obtaining the previous polynomial gn.");
-            ProtocolError::InvalidClaim
+            ProtocolResponse::InvalidClaim
         })?;
 
         values_zero = vec![FieldElement::<P>::zero(); previous_gn.get_number_of_variables() - 1];
@@ -77,14 +77,14 @@ impl<const P: u64> Verifier<P> {
                 "There was an issue at the verifier evaluating the previous polynomial gn. {}",
                 e
             );
-            ProtocolError::InvalidClaim
+            ProtocolResponse::InvalidClaim
         })?;
 
         if grn == evaluated_polynomial {
             return Ok(self.generate_rn());
         }
 
-        Err(ProtocolError::InvalidClaim)
+        Err(ProtocolResponse::InvalidClaim)
     }
 
     // Check the evaluated polynomial with the value of gn(Xn) = g(x1, ..., xn)
@@ -92,20 +92,23 @@ impl<const P: u64> Verifier<P> {
         &self,
         last_gn: &Polynomial<P>,
         values: Vec<FieldElement<P>>,
-    ) -> Result<FieldElement<P>, ProtocolError> {
-        let result = FieldElement::one();
+    ) -> ProtocolResponse {
+        let result = ProtocolResponse::ValidClaim;
 
         let mut values_zero =
             vec![FieldElement::<P>::zero(); last_gn.get_number_of_variables() - 1];
 
-        let last_rn = values.last().ok_or_else(|| {
-            debug!("Error obtaining last rn at verifier.");
-            ProtocolError::InvalidClaim
-        })?;
+        match values.last() {
+            Some(last_rn) => {
+                values_zero.push(*last_rn);
+            }
+            None => {
+                debug!("Error obtaining last rn at verifier.");
+                return ProtocolResponse::InvalidClaim;
+            }
+        }
 
-        values_zero.push(*last_rn);
-
-        Ok(result)
+        result
     }
 
     // Generate rn value after computing gn successfully in each round.

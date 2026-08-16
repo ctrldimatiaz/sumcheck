@@ -22,14 +22,16 @@ impl fmt::Display for PolynomialError {
 }
 
 #[derive(Debug, Copy, Clone, PartialEq)]
-pub enum ProtocolError {
+pub enum ProtocolResponse {
     InvalidClaim,
+    ValidClaim,
 }
 
-impl fmt::Display for ProtocolError {
+impl fmt::Display for ProtocolResponse {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::InvalidClaim => write!(f, "Invalid Claim."),
+            Self::ValidClaim => write!(f, "Invalid Claim."),
         }
     }
 }

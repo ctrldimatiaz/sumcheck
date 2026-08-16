@@ -2,6 +2,7 @@ use log::{error, info};
 
 use crate::{
     field::field_element::FieldElement,
+    helpers::error::ProtocolResponse,
     polynomials::polynomial::Polynomial,
     protocol::{prover::Prover, verifier::Verifier},
 };
@@ -77,11 +78,14 @@ impl<const P: u64> SumCheck<P> {
         let v = round_gn.last().unwrap();
 
         match self.verifier.final_round(v, round) {
-            Ok(_rn) => {
+            ProtocolResponse::ValidClaim => {
                 info!("Verifier computed final round successfully.");
             }
-            Err(e) => {
-                error!("Error in verifier at last round: {}", e);
+            ProtocolResponse::InvalidClaim => {
+                error!(
+                    "Error in verifier at last round: {}",
+                    ProtocolResponse::InvalidClaim
+                );
                 return false;
             }
         }
