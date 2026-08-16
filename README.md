@@ -19,20 +19,20 @@ V checks that gv(rv) = g(r1,...,rv), rejecting if not.
 
 ## Mathematic concepts vs implementation
 
-/field
+`/field`
 
-- Finite Field: Fp where p is prime and denote the set of integers modulo p. Used through FieldElement<P> for a chosen prime P under /field folder. Being p prime we are sure that adition, subtraction, multiplication and division work. Due to the fact that except for 0 all elements of the field are unitys (1, 2,...,p-1). It is later usefull for the use of polynomials.
+- Finite Field: Fp where p is prime and denote the set of integers modulo p. Used through `FieldElement<P>` for a chosen prime P under /field folder. Being p prime we are sure that adition, subtraction, multiplication and division work. Due to the fact that except for 0 all elements of the field are unitys (1, 2,...,p-1). It is later usefull for the use of polynomials.
 
-/polynomials
+`/polynomials`
 
-- Monomial: Monomial<P> is a monomial (ex.: 5x1x4) with given coefficient and exponents (ex.: coefficient: 5, exponents: [] ).
-- Polynomial: Polynomial<P> is a set of monomial and represents polynomial over the field Fp.
-- Multilinear: Polynomial: It is a Polynomial with every varibale degrees at most 1.
+- Monomial: `Monomial<P>` is a monomial (ex.: 5x1x4) with given coefficient and exponents (ex.: coefficient: 5, exponents: [] ).
+- Polynomial: `Polynomial<P>` is a set of monomial and represents polynomial over the field Fp.
+- Multilinear Polynomial: It is a Polynomial with every varibale degrees at most 1.
 
-/protocol
+`/protocol`
 
-- Prover:Prover<P> implements the prover side of the Sum-Check protocol. Currently reducing the multilinear polynomial to a univariate polynomial on each round.
-- Verifier: Verifier<P> implements the verifier side of the Sum-Check protocol with each round verification and the generation of the rn used after round 1.
+- Prover:`Prover<P>` implements the prover side of the Sum-Check protocol. Currently reducing the multilinear polynomial to a univariate polynomial on each round.
+- Verifier: `Verifier<P>` implements the verifier side of the Sum-Check protocol with each round verification and the generation of the rn used after round 1.
 
 ## Vision
 
