@@ -2,37 +2,52 @@
 
 ## Protocol Description 
 
-Suppose we are given a v-variate polynomial g defined over a finite field F. The purpose of the sum-check
-protocol is for prover to provide the verifier with the following sum:
+Central mathematic problems is computing the sum of:
 
-H := ∑b1∈{0,1} ∑b2∈{0,1} ... ∑bv∈{0,1} (g(b1,...,bv)).
+H := ∑b1∈{0,1}∑ b2∈{0,1} ...∑ bv∈{0,1} (g(b1,...,bv)) 
 
-• At the start of the protocol, the prover sends a value C1 claimed to equal the value H defined in Equation (4.1).
-• In the first round, P sends the univariate polynomial g1(X1) claimed to equal ∑(x2,...,xv)∈{0,1}v−1 g(X1, x2,..., xv). V checks that C1 = g1(0) +g1(1), and that g1 is a univariate polynomial of degree at most deg1(g), rejecting if not. Here, degj(g) denotes the degree of g(X1,...,Xv) in variable Xj
-• V chooses a random element r1 ∈ F, and sends r1 to P.
-• In the jth round, for 1 < j < v, P sends to V a univariate polynomial gj(Xj) claimed to equal ∑(x j+1,...,xv)∈{0,1}v−j g(r1,...,rj−1,Xj, xj+1,..., xv). V checks that gj is a univariate polynomial of degree at most degj(g), and that gj−1(rj−1) = gj(0) +gj(1), rejecting if not.
-• V chooses a random element rj ∈ F, and sends rj to P.
-• In Round v, P sends to V a univariate polynomial gv(Xv) claimed to equal g(r1,...,rv−1,Xv). V checks that gv is a univariate polynomial of degree at most degv(g), rejecting if not, and also checks that gv−1(rv−1) = gv(0) +gv(1).
-• V chooses a random element rv ∈ F and evaluates g(r1,...,rv) with a single oracle query to g.
-V checks that gv(rv) = g(r1,...,rv), rejecting if not.
-• If V has not yet rejected, V halts and accepts.
+The prover initially claims a value C₁ equal to H. In each subsequent round, the prover sends a univariate polynomial that is claimed to be the appropriate partial sum of the original polynomial. The verifier does not check that the polynomial reduced by the prover is derived from the original polynomial g. Instead, it checks consistency in the response between rounds through random challenges that make it difficult (if not statistical negligible) for a dishonest prover to maintain consistency with a false claim.
+
+Prover &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Verifier
+
+C₁ = claimed H <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;───────────────────────><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<─────────────────────── Asks to prove it<br>
+        
+g₁(X₁) &nbsp;───────────────────────> check: C₁ = g₁(0) + g₁(1)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<─────────────────────── choose r₁<br>
+
+g₂(X₂) &nbsp;───────────────────────> check: g₁(r₁) = g₂(0) + g₂(1)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<─────────────────────── choose r₂<br>
+...<br>
+
+gᵥ(Xᵥ) &nbsp;───────────────────────> check: gᵥ₋₁(rᵥ₋₁) = gᵥ(0) + gᵥ(1)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<─────────────────────── choose rᵥ<br>
+        
+─────────────> final verifier check: gᵥ(rᵥ) = g(r₁,...,rᵥ)
+
+Generally, the polynomail gj(X) is constructed as:
+gj​(Xj​)=xj+1​,…,xv​∈{0,1}∑​g(r1​,…,rj−1​,Xj​,xj+1​,…,xv​).
 
 ## Mathematic concepts vs implementation
 
-`/field`
+`/field` - Representation of field elements and its algebraic operations
 
-- Finite Field: Fp where p is prime and denote the set of integers modulo p. Used through `FieldElement<P>` for a chosen prime P under /field folder. Being p prime we are sure that adition, subtraction, multiplication and division work. Due to the fact that except for 0 all elements of the field are unitys (1, 2,...,p-1). It is later usefull for the use of polynomials.
+- Finite Field: Fp where p is prime and denote the set of integers modulo p. Used through `FieldElement<P>` for a chosen prime P under /field folder. Because p is prime, the integers modulo p form a field Fp. Addition, subtraction, and multiplication are closed operations, and every nonzero element has a multiplicative inverse, allowing division by nonzero elements.
 
-`/polynomials`
+`/polynomials` - Representation of the polynomials needed 
 
-- Monomial: `Monomial<P>` is a monomial (ex.: 5x1x4) with given coefficient and exponents (ex.: coefficient: 5, exponents: [] ).
+- Monomial: `Monomial<P>` is a monomial (ex.: 5x1x4) with given coefficient and exponents (ex.: coefficient: 5, exponents: [1,0,0,1] ).
 - Polynomial: `Polynomial<P>` is a set of monomial and represents polynomial over the field Fp.
 - Multilinear Polynomial: It is a Polynomial with every varibale degrees at most 1.
 
-`/protocol`
+`/protocol` - Contains specific implementations of the entities needed for this protocol
 
-- Prover:`Prover<P>` implements the prover side of the Sum-Check protocol. Currently reducing the multilinear polynomial to a univariate polynomial on each round.
+- Prover:`Prover<P>` implements the prover side of the Sum-Check protocol. Constructing gj through fixing the randomized rn got from the verifier.
 - Verifier: `Verifier<P>` implements the verifier side of the Sum-Check protocol with each round verification and the generation of the rn used after round 1.
+- Protocol: `SumCheck<P>` implements the simulation of interaction between Prover and Verifier as described above.
+  
+`/examples`
 
 ## Vision
 
