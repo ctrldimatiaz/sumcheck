@@ -3,17 +3,21 @@ use rand::RngExt;
 
 use crate::{
     field::field_element::FieldElement, helpers::error::ProtocolResponse,
-    polynomials::polynomial::Polynomial,
+    polynomials::polynomial::Polynomial, protocol::oracle::Oracle,
 };
 
 //the verifier will only check the claimed_sum on round one
 pub struct Verifier<const P: u64> {
     claimed_sum: FieldElement<P>,
+    oracle: Oracle<P>,
 }
 
 impl<const P: u64> Verifier<P> {
-    pub fn new(claimed_sum: FieldElement<P>) -> Self {
-        Verifier { claimed_sum }
+    pub fn new(claimed_sum: FieldElement<P>, oracle: Oracle<P>) -> Self {
+        Verifier {
+            claimed_sum,
+            oracle,
+        }
     }
 
     // Check each round prover claim integrity and return rn where n = number of the round or
@@ -93,8 +97,6 @@ impl<const P: u64> Verifier<P> {
         last_gn: &Polynomial<P>,
         values: Vec<FieldElement<P>>,
     ) -> ProtocolResponse {
-        let result = ProtocolResponse::ValidClaim;
-
         let mut values_zero =
             vec![FieldElement::<P>::zero(); last_gn.get_number_of_variables() - 1];
 
@@ -108,7 +110,20 @@ impl<const P: u64> Verifier<P> {
             }
         }
 
-        result
+        match last_gn.evaluate(&values_zero) {
+            Ok(f) => {
+                let result = self.oracle.evaluate(&values).unwrap_or_default();
+
+                if !(f == result) {
+                    return ProtocolResponse::InvalidClaim;
+                }
+            }
+            Err(e) => {
+                debug!("Error evaluating last gn at final round: {}", e);
+                return ProtocolResponse::InvalidClaim;
+            }
+        }
+        ProtocolResponse::ValidClaim
     }
 
     // Generate rn value after computing gn successfully in each round.

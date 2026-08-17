@@ -1,7 +1,7 @@
 use crate::{
     field::field_element::FieldElement,
     polynomials::{monomial::Monomial, multilinear::MultilinearPolynomial, polynomial::Polynomial},
-    protocol::{prover::Prover, sumcheck::SumCheck, verifier::Verifier},
+    protocol::{oracle::Oracle, prover::Prover, sumcheck::SumCheck, verifier::Verifier},
 };
 
 pub struct ToyExample<const P: u64> {}
@@ -22,11 +22,13 @@ impl<const P: u64> ToyExample<P> {
 
         let multilinear = MultilinearPolynomial::new(polynomial).unwrap();
 
-        let prover = Prover::new(multilinear);
+        let prover = Prover::new(multilinear.clone());
+
+        let oracle = Oracle::new(multilinear);
 
         let claimed_sum = prover.claimed_sum();
 
-        let verifier = Verifier::new(claimed_sum);
+        let verifier = Verifier::new(claimed_sum, oracle);
 
         let mut sumcheck = SumCheck::new(prover, verifier, 3);
 
