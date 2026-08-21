@@ -1,4 +1,4 @@
-use std::fmt::Display;
+use std::{fmt::Display, ops::Mul};
 
 use itertools::Itertools;
 use log::debug;
@@ -135,6 +135,21 @@ impl<const P: u64> Display for Monomial<P> {
                 })
                 .join("")
         )
+    }
+}
+
+impl<const P: u64> Mul for Monomial<P> {
+    type Output = Self;
+    fn mul(self, rhs: Monomial<P>) -> Monomial<P> {
+        let coefficient = self.coefficient * rhs.coefficient;
+        let exponents = self
+            .exponents
+            .iter()
+            .enumerate()
+            .map(|(index, e)| e + rhs.exponents[index])
+            .collect();
+
+        Self::new(coefficient, exponents).unwrap()
     }
 }
 

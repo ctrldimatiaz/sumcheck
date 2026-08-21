@@ -1,4 +1,4 @@
-use std::{collections::HashMap, fmt::Display};
+use std::{collections::HashMap, fmt::Display, ops::Mul};
 
 use itertools::Itertools;
 use log::debug;
@@ -40,7 +40,12 @@ impl<const P: u64> Polynomial<P> {
         })
     }
 
-    // Check if polynomial is multilinear by checking that all terms are multilinear
+    pub fn constant(coeff: FieldElement<P>) -> Self {
+        let terms = vec![Monomial::new(coeff, vec![]).unwrap()];
+        Self { terms }
+    }
+
+    // Check if polynomial is multilinear by checking that all terms multilinearity
     pub fn is_multilinear(&self) -> bool {
         self.terms.iter().all(|term| term.is_multilinear())
     }
@@ -152,6 +157,11 @@ impl<const P: u64> Polynomial<P> {
         self.terms.first().unwrap().get_number_of_variables()
     }
 
+    // Get the number of terms (monomials) the polynomial has
+    pub fn get_number_of_terms(&self) -> usize {
+        self.terms.len()
+    }
+
     // Simplify the polynomial collecting the terms with the same exponents.
     // (=> there are variables repeated that could be simplified)
     fn collect_terms(terms: &[Monomial<P>]) -> Vec<Monomial<P>> {
@@ -187,6 +197,21 @@ impl<const P: u64> Polynomial<P> {
 impl<const P: u64> Display for Polynomial<P> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.get_readable_polynomial())
+    }
+}
+
+// Multiply
+impl<const P: u64> Mul for Polynomial<P> {
+    type Output = Self;
+    fn mul(self, polynomial: Polynomial<P>) -> Polynomial<P> {
+        let mut final_terms: Vec<Monomial<P>> = vec![];
+        for i in 0..self.terms.len() {
+            for j in 0..polynomial.get_number_of_terms() {
+                let monomial = self.terms[i].clone() * polynomial.terms[j].clone();
+                final_terms.push(monomial);
+            }
+        }
+        Self::new(final_terms).unwrap()
     }
 }
 
