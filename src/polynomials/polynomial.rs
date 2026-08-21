@@ -40,8 +40,8 @@ impl<const P: u64> Polynomial<P> {
         })
     }
 
-    pub fn constant(coeff: FieldElement<P>) -> Self {
-        let terms = vec![Monomial::new(coeff, vec![]).unwrap()];
+    pub fn constant(coeff: FieldElement<P>, num_of_variables: usize) -> Self {
+        let terms = vec![Monomial::new(coeff, vec![0; num_of_variables]).unwrap()];
         Self { terms }
     }
 
@@ -297,9 +297,63 @@ mod tests {
         );
         assert_eq!(
             multilinear_polynomial
-                .evaluate(&(vec![FieldElement::zero(); 2]))
+                .evaluate(&[FieldElement::zero(); 2])
                 .unwrap(),
             FieldElement::zero()
         )
+    }
+
+    #[test]
+    fn test_polynomial_multiplication() {
+        // constant == 2
+        let constant_polynomial = P17::constant(FieldElement::from_u64(19_u64), 2);
+
+        //5x2 + 10x1x2
+        let multilinear_polynomial = P17::new(vec![
+            Monomial::new(FieldElement::from_u64(5), vec![0, 1]).unwrap(),
+            Monomial::new(FieldElement::from_u64(10), vec![1, 1]).unwrap(),
+        ])
+        .unwrap();
+
+        let result = multilinear_polynomial * constant_polynomial;
+
+        let expected = P17::new(vec![
+            Monomial::new(FieldElement::from_u64(10_u64), vec![0, 1]).unwrap(),
+            Monomial::new(FieldElement::from_u64(20_u64), vec![1, 1]).unwrap(),
+        ])
+        .unwrap();
+
+        assert_eq!(
+            result.evaluate(&[FieldElement::zero(), FieldElement::one()]),
+            expected.evaluate(&[FieldElement::zero(), FieldElement::one()]),
+        );
+
+        let lagrange_zero = P17::new(vec![
+            Monomial::new(FieldElement::one(), vec![1, 0]).unwrap(),
+        ])
+        .unwrap();
+
+        let lagrange_one = P17::new(vec![
+            Monomial::new(FieldElement::one(), vec![0, 0]).unwrap(),
+            Monomial::new(FieldElement::from_i64(-1), vec![0, 1]).unwrap(),
+        ])
+        .unwrap();
+
+        let result = lagrange_one * lagrange_zero;
+
+        let expected = P17::new(vec![
+            Monomial::new(FieldElement::one(), vec![1, 0]).unwrap(),
+            Monomial::new(FieldElement::from_i64(-1), vec![1, 1]).unwrap(),
+        ])
+        .unwrap();
+
+        assert_eq!(
+            result
+                .evaluate(&[FieldElement::one(), FieldElement::zero()])
+                .unwrap(),
+            expected
+                .evaluate(&[FieldElement::one(), FieldElement::zero()])
+                .unwrap()
+        );
     }
 }

@@ -48,11 +48,13 @@ impl<const P: u64> MultilinearPolynomial<P> {
     }
 
     fn langrage_basis(values: &[FieldElement<P>]) -> Result<Polynomial<P>, PolynomialError> {
+        let size = values.len();
+
         // now langrage formula
         // 1 - xn or 0 - (1 - xn)
         // evaluation * x1(or (1 -x1))x2(or (1 - x2))...xn( or (1-xn)) as above  ex.: g(0,0) * x1x2 | g(0,1) * x1(1-x2)
-        let mut langrage_polynomial: Polynomial<P> = Polynomial::constant(FieldElement::one());
-        let size = values.len();
+        let mut langrage_polynomial: Polynomial<P> =
+            Polynomial::constant(FieldElement::one(), size);
 
         for (i, value) in values.iter().enumerate() {
             //variable to be considered at given index
@@ -97,7 +99,7 @@ impl<const P: u64> MultilinearPolynomial<P> {
             let evaluation_result = self.polynomial.evaluate(&values).unwrap();
 
             let langrage_polynomial =
-                Self::langrage_basis(&values)? * Polynomial::constant(evaluation_result);
+                Self::langrage_basis(&values)? * Polynomial::constant(evaluation_result, size);
         }
 
         Ok(self.clone())
