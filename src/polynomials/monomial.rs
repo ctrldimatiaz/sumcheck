@@ -219,4 +219,19 @@ mod tests {
 
         assert_eq!(monomial.get_number_of_variables(), 2);
     }
+
+    #[test]
+    fn test_monomial_multiplication() {
+        let coeff = FieldElement::from_u64(2u64);
+        let monomial_one = M17::new(coeff, vec![0, 0]).unwrap();
+        let coeff = FieldElement::from_u64(1u64);
+        let monomial = M17::new(coeff, vec![1, 1]).unwrap();
+
+        let result = monomial_one * monomial;
+
+        assert_eq!(
+            result,
+            Monomial::new(FieldElement::from_u64(2_u64), vec![1, 1]).unwrap()
+        );
+    }
 }
