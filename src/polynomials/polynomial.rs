@@ -233,6 +233,10 @@ impl<const P: u64> Polynomial<P> {
 
     // Generate multilinear f tilde from original multilinear polynomial
     pub fn generate_f_tilde(&self) -> Result<MultilinearPolynomial<P>, PolynomialError> {
+        if self.is_multilinear() || self.is_constant() {
+            return MultilinearPolynomial::new(self.clone());
+        }
+
         let size = self.get_number_of_variables();
         let combinations = 2_u64.pow(size as u32);
         let mut f_tilde: Polynomial<P> = Polynomial::constant(FieldElement::zero(), size);
