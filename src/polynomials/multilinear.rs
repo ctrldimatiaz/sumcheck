@@ -46,64 +46,6 @@ impl<const P: u64> MultilinearPolynomial<P> {
     pub fn compute_sum(&self) -> FieldElement<P> {
         self.polynomial.compute_sum()
     }
-
-    fn langrage_basis(values: &[FieldElement<P>]) -> Result<Polynomial<P>, PolynomialError> {
-        let size = values.len();
-
-        // now langrage formula
-        // 1 - xn or 0 - (1 - xn)
-        // evaluation * x1(or (1 -x1))x2(or (1 - x2))...xn( or (1-xn)) as above  ex.: g(0,0) * x1x2 | g(0,1) * x1(1-x2)
-        let mut langrage_polynomial: Polynomial<P> =
-            Polynomial::constant(FieldElement::one(), size);
-
-        for (i, value) in values.iter().enumerate() {
-            //variable to be considered at given index
-            let mut variable_monomial = vec![0; size];
-            variable_monomial[i] = 1;
-
-            //zero -> ex.: x1
-            if *value == FieldElement::<P>::zero() {
-                let langrage_basis_polynomial =
-                    Polynomial::new(vec![Monomial::new(FieldElement::one(), variable_monomial)?])?;
-                langrage_polynomial = langrage_polynomial * langrage_basis_polynomial;
-            } else {
-                //one -> ex.: 1 - x1
-                let monomial = Monomial::new(FieldElement::one(), vec![0; size])?;
-
-                let monomial_minus =
-                    Monomial::new(FieldElement::from_i64(-1_i64), variable_monomial)?;
-
-                let langrage_basis_polynomial = Polynomial::new(vec![monomial, monomial_minus])?;
-
-                langrage_polynomial = langrage_polynomial * langrage_basis_polynomial;
-            }
-        }
-
-        Ok(langrage_polynomial)
-    }
-
-    // Generate multilinear f tilde from original multilinear polynomial
-    pub fn generate_f_tilde(&self) -> Result<MultilinearPolynomial<P>, PolynomialError> {
-        let size = self.polynomial.get_number_of_variables();
-        let combinations = 2_u64.pow(size as u32);
-        let f_tilde: Polynomial<P>;
-
-        // evaluate through all the combinations according to the number of variables
-        // ex.: 3 variables would go through 0 - (0,0,0), 1 - (0,0,1)... and would have 2³ = 8 combinations
-        for i in 0..combinations {
-            let values: Vec<FieldElement<P>> = number_to_bits_vec(i, size)
-                .iter()
-                .map(|bit| FieldElement::from_u64(*bit))
-                .collect();
-
-            let evaluation_result = self.polynomial.evaluate(&values).unwrap();
-
-            let langrage_polynomial =
-                Self::langrage_basis(&values)? * Polynomial::constant(evaluation_result, size);
-        }
-
-        Ok(self.clone())
-    }
 }
 
 // Display

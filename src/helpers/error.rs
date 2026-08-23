@@ -6,6 +6,7 @@ pub enum PolynomialError {
     DifferentVariableCounts,
     EmptyPolynomial,
     ConstantPolynomial,
+    EmptyMonomial,
 }
 
 impl fmt::Display for PolynomialError {
@@ -17,6 +18,7 @@ impl fmt::Display for PolynomialError {
             }
             Self::EmptyPolynomial => write!(f, "Polynomial is empty"),
             Self::ConstantPolynomial => write!(f, "Polynomial is constant. No use for it."),
+            Self::EmptyMonomial => write!(f, "Monomial is empty."),
         }
     }
 }

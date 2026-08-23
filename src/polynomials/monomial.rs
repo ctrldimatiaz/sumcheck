@@ -16,14 +16,21 @@ impl<const P: u64> Monomial<P> {
         coefficient: FieldElement<P>,
         exponents: Vec<usize>,
     ) -> Result<Self, PolynomialError> {
-        if exponents.is_empty() || coefficient == FieldElement::zero() {
+        if exponents.is_empty() {
             return Err(PolynomialError::EmptyPolynomial);
         }
 
-        Ok(Monomial {
+        Ok(Self {
             coefficient,
             exponents,
         })
+    }
+
+    pub fn constant(coefficient: FieldElement<P>, size: usize) -> Self {
+        Self {
+            coefficient,
+            exponents: vec![0; size],
+        }
     }
 
     pub fn exponents(&self) -> &[usize] {
@@ -179,17 +186,14 @@ mod tests {
         let monomial_four = M17::new(coeff, vec![0, 0]).unwrap();
 
         let monomial_not_multilinear = M17::new(coeff, vec![4, 0]).unwrap();
-        let monomial_linear_with_coeff_zero = M17::new(FieldElement::zero(), vec![4, 0]);
+        let monomial_linear_with_coeff_zero = M17::new(FieldElement::zero(), vec![4, 0]).unwrap();
 
         assert!(monomial.is_multilinear());
         assert!(monomial_two.is_multilinear());
         assert!(monomial_three.is_multilinear());
         assert!(monomial_four.is_multilinear());
         assert!(!monomial_not_multilinear.is_multilinear());
-        assert_eq!(
-            monomial_linear_with_coeff_zero,
-            Err(PolynomialError::EmptyPolynomial)
-        );
+        assert!(monomial_linear_with_coeff_zero.is_constant());
     }
 
     #[test]
@@ -200,16 +204,13 @@ mod tests {
         let monomial_three = M17::new(coeff, vec![1, 0]).unwrap();
         let monomial_four = M17::new(coeff, vec![0, 0]).unwrap();
 
-        let monomial_not_multilinear = M17::new(FieldElement::zero(), vec![4, 0]);
+        let monomial_not_multilinear = M17::new(FieldElement::zero(), vec![4, 0]).unwrap();
 
         assert!(!monomial.is_constant());
         assert!(!monomial_two.is_constant());
         assert!(!monomial_three.is_constant());
         assert!(monomial_four.is_constant());
-        assert_eq!(
-            monomial_not_multilinear,
-            Err(PolynomialError::EmptyPolynomial)
-        );
+        assert!(monomial_not_multilinear.is_constant());
     }
 
     #[test]

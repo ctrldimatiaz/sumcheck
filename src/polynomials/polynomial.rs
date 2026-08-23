@@ -1,4 +1,8 @@
-use std::{collections::HashMap, fmt::Display, ops::Mul};
+use std::{
+    collections::HashMap,
+    fmt::Display,
+    ops::{Add, Mul},
+};
 
 use itertools::Itertools;
 use log::debug;
@@ -6,7 +10,7 @@ use log::debug;
 use crate::{
     field::field_element::FieldElement,
     helpers::{error::PolynomialError, functions::number_to_bits_vec},
-    polynomials::monomial::Monomial,
+    polynomials::{monomial::Monomial, multilinear::MultilinearPolynomial},
 };
 
 #[derive(Debug, Clone, PartialEq)]
@@ -41,7 +45,7 @@ impl<const P: u64> Polynomial<P> {
     }
 
     pub fn constant(coeff: FieldElement<P>, num_of_variables: usize) -> Self {
-        let terms = vec![Monomial::new(coeff, vec![0; num_of_variables]).unwrap()];
+        let terms = vec![Monomial::constant(coeff, num_of_variables)];
         Self { terms }
     }
 
@@ -191,6 +195,69 @@ impl<const P: u64> Polynomial<P> {
             })
             .collect()
     }
+
+    fn langrage_basis(values: &[FieldElement<P>]) -> Result<Polynomial<P>, PolynomialError> {
+        let size = values.len();
+
+        // now langrage formula
+        // 1 - xn or 0 - (1 - xn)
+        // evaluation * x1(or (1 -x1))x2(or (1 - x2))...xn( or (1-xn)) as above  ex.: g(0,0) * x1x2 | g(0,1) * x1(1-x2)
+        let mut langrage_polynomial: Polynomial<P> =
+            Polynomial::constant(FieldElement::one(), size);
+
+        for (i, value) in values.iter().enumerate() {
+            //variable to be considered at given index
+            let mut variable_monomial = vec![0; size];
+            variable_monomial[i] = 1;
+
+            //zero -> ex.: x1
+            if *value == FieldElement::<P>::one() {
+                let langrage_basis_polynomial =
+                    Polynomial::new(vec![Monomial::new(FieldElement::one(), variable_monomial)?])?;
+                langrage_polynomial = langrage_polynomial * langrage_basis_polynomial;
+            } else {
+                //one -> ex.: 1 - x1
+                let monomial = Monomial::new(FieldElement::one(), vec![0; size])?;
+
+                let monomial_minus =
+                    Monomial::new(FieldElement::from_i64(-1_i64), variable_monomial)?;
+
+                let langrage_basis_polynomial = Polynomial::new(vec![monomial, monomial_minus])?;
+
+                langrage_polynomial = langrage_polynomial * langrage_basis_polynomial;
+            }
+        }
+
+        Ok(langrage_polynomial)
+    }
+
+    // Generate multilinear f tilde from original multilinear polynomial
+    pub fn generate_f_tilde(&self) -> Result<MultilinearPolynomial<P>, PolynomialError> {
+        let size = self.get_number_of_variables();
+        let combinations = 2_u64.pow(size as u32);
+        let mut f_tilde: Polynomial<P> = Polynomial::constant(FieldElement::zero(), size);
+
+        // evaluate through all the combinations according to the number of variables
+        // ex.: 3 variables would go through 0 - (0,0,0), 1 - (0,0,1)... and would have 2³ = 8 combinations
+        for i in 0..combinations {
+            let values: Vec<FieldElement<P>> = number_to_bits_vec(i, size)
+                .iter()
+                .map(|bit| FieldElement::from_u64(*bit))
+                .collect();
+
+            let evaluation_result = self.evaluate(&values).unwrap();
+
+            //get langrage polynomial
+            let langrage_polynomial =
+                Self::langrage_basis(&values)? * Polynomial::constant(evaluation_result, size);
+
+            f_tilde = f_tilde + langrage_polynomial;
+        }
+
+        let result = MultilinearPolynomial::new(f_tilde)?;
+
+        Ok(result)
+    }
 }
 
 // Display
@@ -212,6 +279,20 @@ impl<const P: u64> Mul for Polynomial<P> {
             }
         }
         Self::new(final_terms).unwrap()
+    }
+}
+
+// Sum polynomials
+impl<const P: u64> Add for Polynomial<P> {
+    type Output = Self;
+    fn add(self, polynomial: Polynomial<P>) -> Polynomial<P> {
+        let mut monomials: Vec<Monomial<P>> = self.terms.clone();
+
+        for j in 0..polynomial.get_number_of_terms() {
+            monomials.push(polynomial.terms[j].clone());
+        }
+
+        Self::new(monomials).unwrap()
     }
 }
 
@@ -247,7 +328,10 @@ mod tests {
         ])
         .unwrap();
 
+        let constant_polynomial_ctor = P17::constant(FieldElement::from_u64(10), 7);
+
         assert!(constant_polynomial.is_constant());
+        assert!(constant_polynomial_ctor.is_constant());
         assert!(!not_constant_polynomial.is_constant());
     }
 

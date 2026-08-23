@@ -1,4 +1,8 @@
-use crate::{examples::toyexample::ToyExample, field::field_element::FieldElement};
+use crate::{
+    examples::{mleexample::MultilinearExtensionExample, toyexample::ToyExample},
+    field::field_element::FieldElement,
+    polynomials::{monomial::Monomial, multilinear::MultilinearPolynomial, polynomial::Polynomial},
+};
 use dotenvy::dotenv;
 use env_logger::Env;
 use log::{error, info};
@@ -24,8 +28,24 @@ fn main() {
 
     if toy_example.run() {
         info!("Toy example ran gracefully.");
-        return;
+
+        // x2 + 2x1
+        let polynomial: Polynomial<17> = Polynomial::new(vec![
+            Monomial::new(FieldElement::from_u64(1), vec![0, 1]).unwrap(),
+            Monomial::new(FieldElement::from_u64(2), vec![1, 0]).unwrap(),
+        ])
+        .unwrap();
+        let mle_example: MultilinearExtensionExample<17> =
+            MultilinearExtensionExample::new(&polynomial);
+
+        if mle_example.generate_f_tilde() {
+            info!(
+                "Successfully generated f tilde of polynomial: {}",
+                &polynomial
+            );
+            return;
+        }
     }
 
-    error!("Toy example ran with failed step.");
+    error!("Toy example ran failed.");
 }
