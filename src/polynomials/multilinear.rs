@@ -1,9 +1,8 @@
 use std::fmt::Display;
 
 use crate::{
-    field::field_element::FieldElement,
-    helpers::{error::PolynomialError, functions::number_to_bits_vec},
-    polynomials::{monomial::Monomial, polynomial::Polynomial},
+    field::field_element::FieldElement, helpers::error::PolynomialError,
+    polynomials::polynomial::Polynomial,
 };
 
 #[derive(Debug, Clone, PartialEq)]

@@ -17,7 +17,7 @@ impl<const P: u64> Monomial<P> {
         exponents: Vec<usize>,
     ) -> Result<Self, PolynomialError> {
         if exponents.is_empty() {
-            return Err(PolynomialError::EmptyPolynomial);
+            return Err(PolynomialError::EmptyMonomial);
         }
 
         Ok(Self {

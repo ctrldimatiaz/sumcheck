@@ -1,7 +1,7 @@
 use crate::{
     examples::{mleexample::MultilinearExtensionExample, toyexample::ToyExample},
     field::field_element::FieldElement,
-    polynomials::{monomial::Monomial, multilinear::MultilinearPolynomial, polynomial::Polynomial},
+    polynomials::{monomial::Monomial, polynomial::Polynomial},
 };
 use dotenvy::dotenv;
 use env_logger::Env;
