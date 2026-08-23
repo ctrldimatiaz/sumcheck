@@ -1,6 +1,7 @@
 use std::{
     fmt::Display,
     ops::{Add, Div, Mul, Neg, Sub},
+    str::FromStr,
 };
 
 #[derive(Debug, Copy, Clone, PartialEq)]
@@ -117,6 +118,25 @@ impl<const P: u64> Default for FieldElement<P> {
 impl<const P: u64> Display for FieldElement<P> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.value)
+    }
+}
+
+// Parse to FieldElement from str
+impl<const P: u64> FromStr for FieldElement<P> {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        // Try parsing as i64 first (handles negative numbers)
+        if let Ok(n) = s.parse::<i64>() {
+            return Ok(FieldElement::from_i64(n));
+        }
+
+        // Try parsing as u64 (handles large positive numbers > i64::MAX)
+        if let Ok(n) = s.parse::<u64>() {
+            return Ok(FieldElement::from_u64(n));
+        }
+
+        Err(format!("Failed to parse '{}' as i64 or u64", s))
     }
 }
 
