@@ -39,7 +39,7 @@ gj​(Xj​)=xj+1​,…,xv​∈{0,1}∑​g(r1​,…,rj−1​,Xj​,xj+1​,
 
 - Monomial: `Monomial<P>` is a monomial (ex.: 5x1x4) with given coefficient and exponents (ex.: coefficient: 5, exponents: [1,0,0,1] ).
 - Polynomial: `Polynomial<P>` is a set of monomial and represents polynomial over the field Fp.
-- Multilinear Polynomial: It is a Polynomial with every varibale degrees at most 1.
+- Multilinear Polynomial: `MultilinearPolynomial<P>` It consists of a field that is a Polynomial with every varibale degrees at most 1 (by definition).
 
 `/protocol` - Contains specific implementations of the entities needed for this protocol
 
@@ -52,8 +52,8 @@ gj​(Xj​)=xj+1​,…,xv​∈{0,1}∑​g(r1​,…,rj−1​,Xj​,xj+1​,
 
 - ExampleOrchestrator:`ExampleOrchestrator<P>` responsible for parsing inputs and run the requested examples described below.
 - ToyExample: `ToyExample<P>` Initializes `Prover<P>`, `Verifie<P>`, `Oracle<P>` and `SumCheck<P>` and processes one example with an honest prover.
-- MultilinearExtensionExample: `MultilinearExtensionExample<P>` implements one dummy generation of f_tilde given a polynomial.
-- MultilinearExtensionFromEvaluations<P>: `MultilinearExtensionFromEvaluations<P>` responsible for generating the multilinear extension of a function f given its evaluations and the vector r as described in Exercise 3.4.
+- MultilinearExtensionExample: `MultilinearExtensionExample<P>` implements one dummy generation of f_tilde given a polynomial
+- MultilinearExtensionFromEvaluations: `MultilinearExtensionFromEvaluations<P>` responsible for generating the multilinear extension of a function f given its evaluations and the vector r as described in Exercise 3.4.
 
 ## Vision
 
