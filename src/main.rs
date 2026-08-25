@@ -1,16 +1,10 @@
-use std::env;
-
 use crate::{
-    examples::{
-        exampleorchestrator::ExampleOrchestrator, mleexample::MultilinearExtensionExample,
-        toyexample::ToyExample,
-    },
+    examples::{exampleorchestrator::ExampleOrchestrator, toyexample::ToyExample},
     field::field_element::FieldElement,
-    polynomials::{monomial::Monomial, polynomial::Polynomial},
 };
 use dotenvy::dotenv;
 use env_logger::Env;
-use log::{error, info};
+use log::info;
 
 mod examples;
 mod field;
