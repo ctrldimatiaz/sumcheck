@@ -37,3 +37,18 @@ impl fmt::Display for ProtocolResponse {
         }
     }
 }
+
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub enum InputParserError {
+    ErrorParsingFieldElement,
+    LengthMismatch,
+}
+
+impl fmt::Display for InputParserError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::ErrorParsingFieldElement => write!(f, "Error parsing field element."),
+            Self::LengthMismatch => write!(f, "Evaluations and input vector lengths mismatch."),
+        }
+    }
+}

@@ -4,6 +4,8 @@ use std::{
     str::FromStr,
 };
 
+use crate::helpers::error::InputParserError;
+
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct FieldElement<const P: u64> {
     pub value: u64,
@@ -123,7 +125,7 @@ impl<const P: u64> Display for FieldElement<P> {
 
 // Parse to FieldElement from str
 impl<const P: u64> FromStr for FieldElement<P> {
-    type Err = String;
+    type Err = InputParserError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         // Try parsing as i64 first (handles negative numbers)
@@ -136,7 +138,7 @@ impl<const P: u64> FromStr for FieldElement<P> {
             return Ok(FieldElement::from_u64(n));
         }
 
-        Err(format!("Failed to parse '{}' as i64 or u64", s))
+        Err(InputParserError::ErrorParsingFieldElement)
     }
 }
 

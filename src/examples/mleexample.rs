@@ -11,6 +11,7 @@ impl<'a, const P: u64> MultilinearExtensionExample<'a, P> {
         Self { polynomial }
     }
 
+    // Here we generate f tilde according to a given polynomial
     pub fn generate_f_tilde(&self) -> bool {
         match self.polynomial.generate_f_tilde() {
             Ok(poly) => {
