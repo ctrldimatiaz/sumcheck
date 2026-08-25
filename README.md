@@ -46,8 +46,14 @@ gj​(Xj​)=xj+1​,…,xv​∈{0,1}∑​g(r1​,…,rj−1​,Xj​,xj+1​,
 - Prover:`Prover<P>` implements the prover side of the Sum-Check protocol. Constructing gj through fixing the randomized rn got from the verifier.
 - Verifier: `Verifier<P>` implements the verifier side of the Sum-Check protocol with each round verification and the generation of the rn used after round 1.
 - Protocol: `SumCheck<P>` implements the simulation of interaction between Prover and Verifier as described above.
-  
+- Oracle: `Oracle<P>` abstraction that should be available for verifier that implements the evaluation of a multilinear polynomial at point (r1,...,rn) 
+
 `/examples`
+
+- ExampleOrchestrator:`ExampleOrchestrator<P>` responsible for parsing inputs and run the requested examples described below.
+- ToyExample: `ToyExample<P>` Initializes `Prover<P>`, `Verifie<P>`, `Oracle<P>` and `SumCheck<P>` and processes one example with an honest prover.
+- MultilinearExtensionExample: `MultilinearExtensionExample<P>` implements one dummy generation of f_tilde given a polynomial.
+- MultilinearExtensionFromEvaluations<P>: `MultilinearExtensionFromEvaluations<P>` responsible for generating the multilinear extension of a function f given its evaluations and the vector r as described in Exercise 3.4.
 
 ## Vision
 
@@ -81,6 +87,14 @@ or only:
 
 ```shell
 cargo run
+```
+On a succesfull run you should select the option to be tested:
+
+```shell
+ 1 - ToyExample
+ 2 - Multilinear extension through evaluations and vector r (Exercise 3.4)
+ 3 - Dummy f tilde generation
+ 0 - Exit
 ```
 
 ## Environment varibales
