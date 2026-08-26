@@ -74,13 +74,14 @@ impl<'a, const P: u64> ExampleOrchestrator<P> {
                 }
             }
 
+            input.clear();
             Self::print_options();
         }
     }
 
     fn print_options() {
         println!(
-            "Please insert the example to be tested: \n 1 - ToyExample\n 2 - Multilinear extension through evaluations and vector r (Exercise 3.4)\n 3 - Dummy f tilde generation\n 0 - Exit"
+            "Please insert the example to be tested: \n 1 - ToyExample\n 2 - Multilinear extension through evaluations and vector r (Exercise 3.4)\n 3 - Dummy f tilde generation\n 0 - Exit\n"
         );
     }
 }
