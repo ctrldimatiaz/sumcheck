@@ -13,6 +13,6 @@ impl<const P: u64> Oracle<P> {
     }
 
     pub fn evaluate(&self, point: &[FieldElement<P>]) -> Result<FieldElement<P>, PolynomialError> {
-        self.polynomial.evaluate(point.to_vec())
+        self.polynomial.evaluate(point)
     }
 }

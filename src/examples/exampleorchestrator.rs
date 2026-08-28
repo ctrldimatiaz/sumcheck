@@ -1,8 +1,12 @@
+use itertools::Itertools;
 use log::{error, info};
 use std::{io, process::exit};
 
 use crate::{
-    examples::{mleexample::MultilinearExtensionExample, toyexample::ToyExample},
+    examples::{
+        mleevaluation::MultilinearExtensionFromEvaluations,
+        mleexample::MultilinearExtensionExample, toyexample::ToyExample,
+    },
     field::field_element::FieldElement,
     helpers::mleinput::MleInput,
     polynomials::{monomial::Monomial, polynomial::Polynomial},
@@ -36,11 +40,15 @@ impl<'a, const P: u64> ExampleOrchestrator<P> {
                 2 => {
                     // x2 + 2x1
 
+                    println!("Insert evaluations array (ex.: 1,2,4,8):");
+
                     let mut evaluations = String::new();
 
                     io::stdin()
                         .read_line(&mut evaluations)
                         .expect("Failed to read evaluations");
+
+                    println!("Insert vector r (ex.: 1,2,4,8):");
 
                     let mut vector_r = String::new();
 
@@ -48,8 +56,42 @@ impl<'a, const P: u64> ExampleOrchestrator<P> {
                         .read_line(&mut vector_r)
                         .expect("Failed to read vector r");
 
-                    let parser = MleInput::<P>::new(&evaluations, &vector_r)
-                        .map_err(|e| error!("Error parsing evaluations or vector: {}", e));
+                    let parser = match MleInput::<P>::new(&evaluations, &vector_r) {
+                        Ok(p) => p,
+                        Err(e) => {
+                            log::error!("Failed to parse evaluations or vector input: {e}");
+                            break;
+                        }
+                    };
+
+                    let evaluater = MultilinearExtensionFromEvaluations::new(parser);
+
+                    match evaluater.generate_f_tilde() {
+                        Ok(mle) => {
+                            info!(
+                                "Successfully generated f tilde from evaluations and vector. F_tilde: {}",
+                                mle
+                            );
+                            match mle.evaluate(evaluater.get_values()) {
+                                Ok(result) => {
+                                    info!(
+                                        "Evaluated f_tilde at ({}): {}",
+                                        evaluater.get_values().iter().join(" , "),
+                                        result
+                                    )
+                                }
+                                Err(e) => error!(
+                                    "Error evaluating f_tilde at ({}). Error {}",
+                                    evaluater.get_values().iter().join(" , "),
+                                    e
+                                ),
+                            }
+                        }
+                        Err(e) => error!(
+                            "Error generating f_tilde from evaluations and vector: {}",
+                            e
+                        ),
+                    }
                 }
                 3 => {
                     // x2 + 2x1

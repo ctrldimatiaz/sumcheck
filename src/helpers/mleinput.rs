@@ -2,8 +2,8 @@ use crate::{field::field_element::FieldElement, helpers::error::InputParserError
 
 // Parser for input as described in Exercise 3.4
 pub struct MleInput<const P: u64> {
-    evaluations: Vec<FieldElement<P>>,
-    vector: Vec<FieldElement<P>>,
+    pub evaluations: Vec<FieldElement<P>>,
+    pub vector: Vec<FieldElement<P>>,
 }
 
 impl<const P: u64> MleInput<P> {
@@ -16,10 +16,6 @@ impl<const P: u64> MleInput<P> {
         evaluations_input: &str,
         vector_input: &str,
     ) -> Result<Self, InputParserError> {
-        if evaluations_input.len() as u64 != 2_u64.pow(vector_input.len() as u32) {
-            return Err(InputParserError::LengthMismatch);
-        }
-
         let evaluations_parse: Result<Vec<FieldElement<P>>, InputParserError> = evaluations_input
             .split(',')
             .map(|s| s.trim().parse::<FieldElement<P>>().map_err(|e| e))
@@ -32,6 +28,10 @@ impl<const P: u64> MleInput<P> {
 
         let evaluations = evaluations_parse?;
         let vector = vector_parse?;
+
+        if evaluations.len() as u64 != 2_u64.pow(vector.len() as u32) {
+            return Err(InputParserError::LengthMismatch);
+        }
 
         Ok(Self {
             evaluations,

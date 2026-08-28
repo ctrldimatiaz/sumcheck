@@ -24,11 +24,8 @@ impl<const P: u64> MultilinearPolynomial<P> {
     }
 
     #[allow(dead_code)]
-    pub fn evaluate(
-        &self,
-        values: Vec<FieldElement<P>>,
-    ) -> Result<FieldElement<P>, PolynomialError> {
-        self.polynomial.evaluate(&values)
+    pub fn evaluate(&self, values: &[FieldElement<P>]) -> Result<FieldElement<P>, PolynomialError> {
+        self.polynomial.evaluate(values)
     }
 
     // Constructing the univariate polynomial gj(Xj)

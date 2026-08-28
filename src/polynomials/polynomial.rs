@@ -196,7 +196,7 @@ impl<const P: u64> Polynomial<P> {
             .collect()
     }
 
-    fn langrage_basis(values: &[FieldElement<P>]) -> Result<Polynomial<P>, PolynomialError> {
+    pub fn langrage_basis(values: &[FieldElement<P>]) -> Result<Polynomial<P>, PolynomialError> {
         let size = values.len();
 
         // now langrage formula
@@ -231,7 +231,7 @@ impl<const P: u64> Polynomial<P> {
         Ok(langrage_polynomial)
     }
 
-    // Generate multilinear f tilde from original multilinear polynomial
+    // Generate multilinear f tilde from original polynomial
     pub fn generate_f_tilde(&self) -> Result<MultilinearPolynomial<P>, PolynomialError> {
         if self.is_multilinear() || self.is_constant() {
             return MultilinearPolynomial::new(self.clone());
