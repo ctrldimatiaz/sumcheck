@@ -98,7 +98,7 @@ mod tests {
 
         let multilinear = M17::new(poly).unwrap();
 
-        let result = multilinear.evaluate(values).unwrap();
+        let result = multilinear.evaluate(&values).unwrap();
 
         assert_eq!(result, FieldElement::from_u64(8));
     }

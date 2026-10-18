@@ -18,12 +18,12 @@ impl<const P: u64> MleInput<P> {
     ) -> Result<Self, InputParserError> {
         let evaluations_parse: Result<Vec<FieldElement<P>>, InputParserError> = evaluations_input
             .split(',')
-            .map(|s| s.trim().parse::<FieldElement<P>>().map_err(|e| e))
+            .map(|s| s.trim().parse::<FieldElement<P>>())
             .collect();
 
         let vector_parse: Result<Vec<FieldElement<P>>, InputParserError> = vector_input
             .split(',')
-            .map(|s| s.trim().parse::<FieldElement<P>>().map_err(|e| e))
+            .map(|s| s.trim().parse::<FieldElement<P>>())
             .collect();
 
         let evaluations = evaluations_parse?;

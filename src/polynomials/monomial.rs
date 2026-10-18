@@ -145,6 +145,7 @@ impl<const P: u64> Display for Monomial<P> {
     }
 }
 
+#[allow(clippy::suspicious_arithmetic_impl)]
 impl<const P: u64> Mul for Monomial<P> {
     type Output = Self;
     fn mul(self, rhs: Monomial<P>) -> Monomial<P> {
@@ -171,7 +172,7 @@ mod tests {
     fn test_zero_evaluation() {
         let monomial = M17::new(FieldElement::one(), vec![1, 2]).unwrap();
         assert_eq!(
-            monomial.evaluate(&vec![F17::zero(); 2]).unwrap(),
+            monomial.evaluate(&[F17::zero(); 2]).unwrap(),
             FieldElement::zero()
         );
     }

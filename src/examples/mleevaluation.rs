@@ -8,7 +8,7 @@ pub struct MultilinearExtensionFromEvaluations<const P: u64> {
     input: MleInput<P>,
 }
 
-impl<'a, const P: u64> MultilinearExtensionFromEvaluations<P> {
+impl<const P: u64> MultilinearExtensionFromEvaluations<P> {
     pub fn new(input: MleInput<P>) -> Self {
         Self { input }
     }

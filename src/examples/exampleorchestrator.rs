@@ -16,7 +16,7 @@ pub struct ExampleOrchestrator<const P: u64> {
     toyexample: ToyExample<P>,
 }
 
-impl<'a, const P: u64> ExampleOrchestrator<P> {
+impl<const P: u64> ExampleOrchestrator<P> {
     pub fn new(toyexample: ToyExample<P>) -> Self {
         Self { toyexample }
     }
@@ -25,7 +25,7 @@ impl<'a, const P: u64> ExampleOrchestrator<P> {
         Self::print_options();
         let mut input = String::new();
 
-        while input.trim() != String::from("0") {
+        while input.trim() != "0" {
             io::stdin()
                 .read_line(&mut input)
                 .expect("Failed to read line");
@@ -106,7 +106,7 @@ impl<'a, const P: u64> ExampleOrchestrator<P> {
                     if mle_example.generate_f_tilde() {
                         info!(
                             "Successfully generated f tilde of polynomial: {}",
-                            &polynomial
+                            polynomial
                         );
                     }
                 }
