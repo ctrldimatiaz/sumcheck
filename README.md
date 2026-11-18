@@ -16,7 +16,7 @@ H := \sum_{b_1 \in \{0,1\}}
 g(b_1,\ldots,b_v)
 $$
 
-The prover initially claims a value \(C_1\) equal to \(H\).
+The prover initially claims a value $$C_1$$ equal to `H`.
 
 In each subsequent round, the prover sends a univariate polynomial representing the appropriate partial sum of the original polynomial.
 
@@ -69,7 +69,7 @@ The interaction between the prover and verifier can be represented as follows:
 
 ### Construction of the Polynomials
 
-At round \(j\), the prover constructs a univariate polynomial \(g_j\) by fixing the variables from previous rounds to the verifier's random challenges and summing over the remaining Boolean variables.
+At round `j`, the prover constructs a univariate polynomial $$g_j$$ by fixing the variables from previous rounds to the verifier's random challenges and summing over the remaining Boolean variables.
 
 Formally:
 
@@ -113,11 +113,11 @@ The project separates the mathematical concepts from their Rust implementations 
 
 Representation of finite field elements and their algebraic operations.
 
-- **Finite Field:** \(\mathbb{F}_p\), where \(p\) is prime, represents the integers modulo \(p\).
+- **Finite Field:** $$F_p$$, where `p` is prime, represents the integers modulo `p`.
 
 - **`FieldElement<P>`:** Represents an element of the finite field for a chosen prime modulus `P`.
 
-Because \(p\) is prime, the integers modulo \(p\) form a field. Addition, subtraction, and multiplication are closed operations, and every nonzero element has a multiplicative inverse, allowing division by nonzero elements.
+Because `p` is prime, the integers modulo `p` form a field. Addition, subtraction, and multiplication are closed operations, and every nonzero element has a multiplicative inverse, allowing division by nonzero elements.
 
 ### `/polynomials` — Polynomial Representations
 
@@ -127,9 +127,7 @@ Representation of the polynomials required by the protocol.
 
   For example:
 
-  $$
-  5x_1x_4
-  $$
+  5 $$x_1$$ $$x_4$$
 
   Can be represented by:
 
