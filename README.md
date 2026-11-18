@@ -113,7 +113,7 @@ The project separates the mathematical concepts from their Rust implementations 
 
 Representation of finite field elements and their algebraic operations.
 
-- **Finite Field:** $$F_p$$, where `p` is prime, represents the integers modulo `p`.
+- **`Finite Field`:** $$F_p$$, where `p` is prime, represents the integers modulo `p`.
 
 - **`FieldElement<P>`:** Represents an element of the finite field for a chosen prime modulus `P`.
 
@@ -173,7 +173,7 @@ The purpose of this application is to gain a deeper understanding of the conside
 
 I chose Rust for this project to deepen my understanding of the language and gain practical experience implementing mathematical and cryptographic primitives in a systems-oriented programming language.
 
-**Current implementation status:** The project currently contains a toy implementation of the Sum-Check protocol. The final verification round and several production-oriented optimizations are still under development.
+**Current implementation status:** The project currently contains a Toy Implementation of the Sum-Check protocol, a Dishonest Prover implementation, a Multilinear extension evaluation of f tilde according to Exercise 3.2 in Justin Thaler's book referenced below and a dummy multilinear polynomial extension implementation. Several production-oriented optimizations are still under development.
 
 ---
 
