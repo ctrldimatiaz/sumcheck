@@ -166,6 +166,7 @@ Contains examples demonstrating the implemented mathematical concepts and protoc
 
 - **`MultilinearExtensionFromEvaluations<P>`:** Generates the multilinear extension of a function \(f\) from its evaluations and a vector \(r\), as described in Exercise 3.4.
 
+- **`DishonestProver<P>`:** Initializes `Prover<P>`, `Verifier<P>`, `Oracle<P>`, and `SumCheck<P>`, and executes an example using an dishonest prover where Prover and Oracle multilinear polynomial are different.
 ---
 
 ## Vision
@@ -188,7 +189,6 @@ This approach simplifies the implementation but limits the range of supported pr
 
 ### Future Improvements
 
-- [ ] Completing and refining the final verification round.
 - [ ] Improving prover and verifier abstractions.
 - [ ] Supporting larger and more general polynomials.
 - [ ] Exploring more efficient polynomial representations.
@@ -223,6 +223,7 @@ After a successful execution, select the example you want to run:
 1 - ToyExample
 2 - Multilinear extension through evaluations and vector r (Exercise 3.4)
 3 - Dummy f tilde generation
+4 - Dishonest Prover
 0 - Exit
 ```
 

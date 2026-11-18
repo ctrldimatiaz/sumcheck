@@ -1,5 +1,6 @@
 use std::{fmt::Display, ops::Mul};
 
+use fmtastic::Superscript;
 use itertools::Itertools;
 use log::debug;
 
@@ -41,7 +42,7 @@ impl<const P: u64> Monomial<P> {
         self.coefficient
     }
 
-    //Check if monomial is is multilinear
+    // Check if monomial is is multilinear
     pub fn is_multilinear(&self) -> bool {
         self.exponents.iter().all(|&e| e <= 1) || self.coefficient == FieldElement::zero()
     }
@@ -137,7 +138,7 @@ impl<const P: u64> Display for Monomial<P> {
                     } else if exp == 1 {
                         format!("x{}", index + 1)
                     } else {
-                        format!("x{}^{}", index + 1, exp)
+                        format!("x{}{}", index + 1, Superscript(exp))
                     }
                 })
                 .join("")

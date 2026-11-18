@@ -1,10 +1,12 @@
 use crate::{
-    examples::{exampleorchestrator::ExampleOrchestrator, toyexample::ToyExample},
+    examples::{
+        dishonestprover::DishonestProver, exampleorchestrator::ExampleOrchestrator,
+        toyexample::ToyExample,
+    },
     field::field_element::FieldElement,
 };
 use dotenvy::dotenv;
 use env_logger::Env;
-use log::info;
 
 mod examples;
 mod field;
@@ -22,11 +24,12 @@ fn main() {
 
     env_logger::init_from_env(env);
 
-    // start examples
-    info!("Starting toy example.");
-
+    // Initialize examples
     let toy_example: ToyExample<PRIMEP> = ToyExample::new();
-    let exampleorchestrator = ExampleOrchestrator::new(toy_example);
+    let dishonest_prover: DishonestProver<PRIMEP> = DishonestProver::new();
+
+    // Iniitialize and run orchestrator
+    let exampleorchestrator = ExampleOrchestrator::new(toy_example, dishonest_prover);
 
     exampleorchestrator.run();
 }

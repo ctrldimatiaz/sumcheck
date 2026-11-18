@@ -6,6 +6,7 @@ edition = "2024"
 [dependencies]
 dotenvy = "0.15.7"
 env_logger = "0.11.11"
+fmtastic = "0.2.2"
 itertools = "0.15.0"
 log = "0.4.33"
 proptest = "1.11.0"

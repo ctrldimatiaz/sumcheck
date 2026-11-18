@@ -1,10 +1,11 @@
+use fmtastic::Superscript;
 use itertools::Itertools;
 use log::{error, info};
 use std::{io, process::exit};
 
 use crate::{
     examples::{
-        mleevaluation::MultilinearExtensionFromEvaluations,
+        dishonestprover::DishonestProver, mleevaluation::MultilinearExtensionFromEvaluations,
         mleexample::MultilinearExtensionExample, toyexample::ToyExample,
     },
     field::field_element::FieldElement,
@@ -14,11 +15,15 @@ use crate::{
 
 pub struct ExampleOrchestrator<const P: u64> {
     toyexample: ToyExample<P>,
+    dishonest_prover: DishonestProver<P>,
 }
 
 impl<const P: u64> ExampleOrchestrator<P> {
-    pub fn new(toyexample: ToyExample<P>) -> Self {
-        Self { toyexample }
+    pub fn new(toyexample: ToyExample<P>, dishonest_prover: DishonestProver<P>) -> Self {
+        Self {
+            toyexample,
+            dishonest_prover,
+        }
     }
 
     pub fn run(&self) {
@@ -40,7 +45,10 @@ impl<const P: u64> ExampleOrchestrator<P> {
                 2 => {
                     // x2 + 2x1
 
-                    println!("Insert evaluations array (ex.: 1,2,4,8):");
+                    println!(
+                        "Insert f evaluations array (ex.: 1,2,4,8 (r{})):",
+                        Superscript(2)
+                    );
 
                     let mut evaluations = String::new();
 
@@ -48,7 +56,7 @@ impl<const P: u64> ExampleOrchestrator<P> {
                         .read_line(&mut evaluations)
                         .expect("Failed to read evaluations");
 
-                    println!("Insert vector r (ex.: 1,2,4,8):");
+                    println!("Insert vector r to be evaluated (ex.: 1,2):");
 
                     let mut vector_r = String::new();
 
@@ -60,7 +68,7 @@ impl<const P: u64> ExampleOrchestrator<P> {
                         Ok(p) => p,
                         Err(e) => {
                             log::error!("Failed to parse evaluations or vector input: {e}");
-                            break;
+                            continue;
                         }
                     };
 
@@ -110,6 +118,9 @@ impl<const P: u64> ExampleOrchestrator<P> {
                         );
                     }
                 }
+                4 => {
+                    self.dishonest_prover.run();
+                }
                 0 => exit(-1),
                 _ => {
                     println!("Not a valid option.");
@@ -123,7 +134,7 @@ impl<const P: u64> ExampleOrchestrator<P> {
 
     fn print_options() {
         println!(
-            "Please insert the example to be tested: \n 1 - ToyExample\n 2 - Multilinear extension through evaluations and vector r (Exercise 3.4)\n 3 - Dummy f tilde generation\n 0 - Exit\n"
+            "Please insert the example to be tested: \n 1 - ToyExample\n 2 - Multilinear extension through evaluations and vector r (Exercise 3.4)\n 3 - Dummy f tilde generation\n 4 - Dishonest Prover\n 0 - Exit\n"
         );
     }
 }
