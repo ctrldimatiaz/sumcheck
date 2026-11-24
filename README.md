@@ -219,7 +219,14 @@ After a successful execution, select the example you want to run:
 
 ```text
 1 - ToyExample
-2 - Multilinear extension through evaluations and vector r (Exercise 3.4)
+2 - Multilinear extension through evaluations and vector r (Exercise 3.3/3.4)
+
+    "Example of Exercise 3.3 inputs:"
+    Insert f evaluations array (ex.: 1,2,4,8 (r²)):
+    1,2,3,4,5,6,7,8
+    Insert vector r to be evaluated (ex.: 1,2):
+    2,4,6
+
 3 - Dummy f tilde generation
 4 - Dishonest Prover
 0 - Exit

@@ -6,25 +6,43 @@ pub struct BooleanCircuit<const P: u64> {
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct ArithmeticOperation<const P: u64> {
     // FieldElements consist of zero or one
-    BoolOperation: BoolOperation,
-    LeftValue: FieldElement<P>,
-    RightValue: FieldElement<P>,
+    boolOperation: BoolOperation,
+    leftValue: FieldElement<P>,
+    rightValue: FieldElement<P>,
 }
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub enum BoolOperation {
-    AND,
-    OR,
-    NOT,
+    AND(u64, u64),
+    OR(u64, u64),
+    NOT(usize),
 }
 
 impl BoolOperation {
     // Calculate value according to arithemtic formula
     pub fn calculate(&self) -> FieldElement<P> {
         match self {
-            Self::AND => LeftValue * RightValue, // (x1 AND x2) = x1*x2
-            Self::NOT => 1 - LeftValue,          // NOT(x) = 1 - x
-            Self::OR => LeftValue + RightValue - LeftValue * RightValue, // (x1 OR x2) = x1 + x2 - x1 *x2
+            Self::AND(x1, x2) => x1 * x2,    // (x1 AND x2) = x1*x2
+            Self::NOT(v) => 1 - v,           // NOT(x) = 1 - x
+            Self::OR(l, r) => l + r - l * r, // (x1 OR x2) = x1 + x2 - x1 *x2
+        }
+    }
+}
+
+impl<const P: u64> ArithmeticOperation {
+    pub fn new(
+        boolOperation: BoolOperation,
+        leftValue: FieldElement<P>,
+        rightValue: FieldElement<P>,
+    ) -> Result<Self, BoolOperationParseError> {
+        if (leftValue != 0 && leftValue != 1) || (rightValue != 0 && rightValue != 1) {
+            BoolOperationParseError::ValuesMustBeOneOrZero
+        }
+
+        Self {
+            boolOperation,
+            leftValue,
+            rightValue,
         }
     }
 }
